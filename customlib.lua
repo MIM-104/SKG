@@ -188,8 +188,47 @@ local RayfieldLibrary = {
 			PlaceholderColor = Color3.fromRGB(150, 150, 160)
 		}
 
+		Custom = {
+			TextColor = Color3.fromRGB(220, 220, 255), -- Light text for readability on dark background
 
+			Background = Color3.fromRGB(25, 25, 55), -- Deep dark blue background
+			Topbar = Color3.fromRGB(35, 35, 75), -- Slightly lighter dark blue for the top bar
+			Shadow = Color3.fromRGB(15, 15, 45), -- Subtle shadow for depth
 
+			NotificationBackground = Color3.fromRGB(30, 30, 70), -- Dark background for notifications
+			NotificationActionsBackground = Color3.fromRGB(45, 45, 85), -- Slight contrast for actions
+
+			TabBackground = Color3.fromRGB(40, 40, 80), -- Tab background matching dark tones
+			TabStroke = Color3.fromRGB(50, 50, 90), -- Tab stroke for separation
+			TabBackgroundSelected = Color3.fromRGB(60, 60, 100), -- Highlight for selected tab
+			TabTextColor = Color3.fromRGB(190, 190, 240), -- Muted light color for tab text
+			SelectedTabTextColor = Color3.fromRGB(240, 240, 255), -- Bright color for selected tab text
+
+			ElementBackground = Color3.fromRGB(35, 35, 75), -- Unified element background
+			ElementBackgroundHover = Color3.fromRGB(45, 45, 95), -- Slightly lighter on hover
+			SecondaryElementBackground = Color3.fromRGB(50, 50, 100), -- For labels/paragraphs
+			ElementStroke = Color3.fromRGB(55, 55, 105), -- Element stroke for borders
+			SecondaryElementStroke = Color3.fromRGB(55, 55, 105),
+
+			SliderBackground = Color3.fromRGB(80, 80, 150), -- Slider background with subtle color
+			SliderProgress = Color3.fromRGB(100, 100, 200), -- Progress color with light blue tone
+			SliderStroke = Color3.fromRGB(90, 90, 180), -- Stroke to match theme
+
+			ToggleBackground = Color3.fromRGB(35, 35, 75), -- Matching dark toggle background
+			ToggleEnabled = Color3.fromRGB(120, 90, 255), -- Vibrant purple for enabled toggle
+			ToggleDisabled = Color3.fromRGB(80, 80, 120), -- Muted dark for disabled toggle
+			ToggleEnabledStroke = Color3.fromRGB(140, 110, 255), -- Lighter stroke for enabled
+			ToggleDisabledStroke = Color3.fromRGB(90, 90, 130), -- Subtle stroke for disabled
+			ToggleEnabledOuterStroke = Color3.fromRGB(50, 50, 90),
+			ToggleDisabledOuterStroke = Color3.fromRGB(60, 60, 100),
+
+			DropdownSelected = Color3.fromRGB(45, 45, 95), -- Dark tone for dropdown selection
+			DropdownUnselected = Color3.fromRGB(35, 35, 75), -- Matches other unselected backgrounds
+
+			InputBackground = Color3.fromRGB(40, 40, 85), -- Dark input background
+			InputStroke = Color3.fromRGB(75, 75, 125), -- Input border for clarity
+			PlaceholderColor = Color3.fromRGB(130, 130, 180) -- Subtle light blue for placeholders
+		}
 	}
 }
 
@@ -280,7 +319,7 @@ local Debounce = false
 local searchOpen = false
 local Notifications = Rayfield.Notifications
 
-local SelectedTheme = RayfieldLibrary.Theme.Default
+local SelectedTheme = RayfieldLibrary.Theme.Custom
 
 local function ChangeTheme(ThemeName)
 	SelectedTheme = RayfieldLibrary.Theme[ThemeName]
