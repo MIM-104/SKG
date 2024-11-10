@@ -216,8 +216,8 @@ local RayfieldLibrary = {
 			SliderStroke = Color3.fromRGB(90, 80, 160), -- Stroke to match the slider colors
 
 			ToggleBackground = Color3.fromRGB(53, 45, 126), -- Toggle background in primary color
-			ToggleEnabled = Color3.fromRGB(90, 80, 200), -- Vibrant blue-purple for enabled toggle
-			ToggleDisabled = Color3.fromRGB(60, 50, 130), -- Muted for disabled toggle
+			ToggleEnabled = Color3.fromRGB(100, 93, 181),
+			ToggleDisabled = Color3.fromRGB(90, 83, 171), -- Muted for disabled toggle
 			ToggleEnabledStroke = Color3.fromRGB(110, 100, 220), -- Lighter stroke for enabled toggle
 			ToggleDisabledStroke = Color3.fromRGB(70, 60, 150), -- Subtle stroke for disabled
 			ToggleEnabledOuterStroke = Color3.fromRGB(40, 35, 100),
