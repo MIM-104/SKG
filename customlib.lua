@@ -432,7 +432,7 @@ local function makeDraggable(object, dragObject, enableTaptic)
             if dragTween then
                 dragTween:Cancel()
             end
-            dragTween = TweenService:Create(object, TweenInfo.new(0.15, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Position = UDim2.fromOffset(position.X, position.Y)})
+            dragTween = TweenService:Create(object, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Position = UDim2.fromOffset(position.X, position.Y)})
             dragTween:Play()
         end
     end)
