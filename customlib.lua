@@ -971,7 +971,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 		end
 	end)
 
-	AddDraggingFunctionality(Main, Topbar)
+	makeDraggable(Main, Topbar)
 	if dragBar then makeDraggable(Main, dragInteract, true) end
 
 	for _, TabButton in ipairs(TabList:GetChildren()) do
