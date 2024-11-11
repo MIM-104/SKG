@@ -451,9 +451,10 @@ local function UnpackColor(Color)
 	return Color3.fromRGB(Color.R, Color.G, Color.B)
 end
 
+local notificationSent = false  -- Flag
+
 local function LoadConfiguration(Configuration)
 	local Data = HttpService:JSONDecode(Configuration)
-	local loadStatus = false
 	
 	for FlagName, FlagValue in next, Data do
 		local Flag = RayfieldLibrary.Flags[FlagName]
@@ -469,16 +470,16 @@ local function LoadConfiguration(Configuration)
 						Flag:Set(FlagValue)
 					end
 				end
-				loadStatus = true
+				
+				if not notificationSent then
+					RayfieldLibrary:Notify({
+						Title = "Configuration Loaded",
+						Content = "The configuration file has been successfully loaded from a previous session."
+					})
+					notificationSent = true
+				end
 			end)
 		end
-	end
-
-	if loadStatus then
-		RayfieldLibrary:Notify({
-			Title = "Configuration Loaded",
-			Content = "The configuration file has been successfully loaded from a previous session."
-		})
 	end
 end
 
@@ -2803,6 +2804,7 @@ end
 
 function RayfieldLibrary:LoadConfiguration()
 	if CEnabled then
+		notificationSent = false
 		local success, result = pcall(function()
 			local configFile = ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension
 			if isfile(configFile) then
