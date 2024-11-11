@@ -2660,6 +2660,7 @@ end
 
 function RayfieldLibrary:Destroy()
 	Rayfield:Destroy()
+	a:Destroy()
 end
 
 Topbar.ChangeSize.MouseButton1Click:Connect(function()
