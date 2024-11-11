@@ -453,31 +453,49 @@ end
 
 local function LoadConfiguration(Configuration)
 	local Data = HttpService:JSONDecode(Configuration)
+	local loadStatus = false
+	
 	for FlagName, FlagValue in next, Data do
-		if RayfieldLibrary.Flags[FlagName] then
-			task.spawn(function() 
-				if RayfieldLibrary.Flags[FlagName].Type == "ColorPicker" then
-					RayfieldLibrary.Flags[FlagName]:Set(UnpackColor(FlagValue))
+		local Flag = RayfieldLibrary.Flags[FlagName]
+		if Flag then
+			task.spawn(function()
+				if Flag.Type == "ColorPicker" then
+					if Flag.Color ~= FlagValue then
+						Flag:Set(UnpackColor(FlagValue))
+					end
 				else
-					if RayfieldLibrary.Flags[FlagName].CurrentValue or RayfieldLibrary.Flags[FlagName].CurrentKeybind or RayfieldLibrary.Flags[FlagName].CurrentOption or RayfieldLibrary.Flags[FlagName].Color ~= FlagValue then RayfieldLibrary.Flags[FlagName]:Set(FlagValue) end
-				end    
+					local current = Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption
+					if current ~= FlagValue then
+						Flag:Set(FlagValue)
+					end
+				end
+				loadStatus = true
 			end)
 		end
 	end
-	return
+
+	if loadStatus then
+		RayfieldLibrary:Notify({
+			Title = "Configuration Loaded",
+			Content = "The configuration file has been successfully loaded from a previous session."
+		})
+	end
 end
 
 local function SaveConfiguration()
 	if not CEnabled then return end
+
 	local Data = {}
-	for i,v in pairs(RayfieldLibrary.Flags) do
-		if v.Type == "ColorPicker" then
-			Data[i] = PackColor(v.Color)
+	for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
+		if Flag.Type == "ColorPicker" then
+			Data[FlagName] = PackColor(Flag.Color)
 		else
-			Data[i] = v.CurrentValue or v.CurrentKeybind or v.CurrentOption or v.Color
+			Data[FlagName] = Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color
 		end
-	end	
-	writefile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension, tostring(HttpService:JSONEncode(Data)))
+	end
+
+	local configFile = ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension
+	writefile(configFile, HttpService:JSONEncode(Data))
 end
 
 function RayfieldLibrary:Notify(data) -- action e.g open messages
@@ -2785,13 +2803,20 @@ end
 
 function RayfieldLibrary:LoadConfiguration()
 	if CEnabled then
-		pcall(function()
-			if isfile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension) then
-				LoadConfiguration(readfile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension))
-				RayfieldLibrary:Notify({Title = "Configuration Loaded", Content = "The configuration file for this script has been loaded from a previous session."})
-				return
+		local success, result = pcall(function()
+			local configFile = ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension
+			if isfile(configFile) then
+				LoadConfiguration(readfile(configFile))
+				return true
 			end
 		end)
+
+		if not success or not result then
+			RayfieldLibrary:Notify({
+				Title = "Load Error",
+				Content = "There was an issue loading the configuration file."
+			})
+		end
 	end
 end
 
