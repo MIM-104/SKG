@@ -1715,6 +1715,46 @@ function RayfieldLibrary:CreateWindow(Settings)
 			return ParagraphValue
 		end
 
+		-- Image Paragraph
+		function Tab:CreateImageParagraph(ImageParagraphSettings)
+			local ImageParagraphValue = {}
+
+			local ImageParagraph = Elements.Template.ImageParagraph:Clone()
+			ImageParagraph.Title.Text = ParagraphSettings.Title
+			ImageParagraph.Content.Text = ParagraphSettings.Content
+			ImageParagraph.Image.Image = ParagraphSettings.Image
+			ImageParagraph.Visible = true
+			ImageParagraph.Parent = TabPage
+
+			ImageParagraph.BackgroundTransparency = 1
+			ImageParagraph.UIStroke.Transparency = 1
+			ImageParagraph.Title.TextTransparency = 1
+			ImageParagraph.Content.TextTransparency = 1
+			ImageParagraph.Image.ImageTransparency = 1
+			
+			ImageParagraph.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
+			ImageParagraph.UIStroke.Color = SelectedTheme.SecondaryElementStroke
+
+			TweenService:Create(ImageParagraph, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+			TweenService:Create(ImageParagraph.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+			TweenService:Create(ImageParagraph.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()	
+			TweenService:Create(ImageParagraph.Content, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+			TweenService:Create(ImageParagraph.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()		
+
+			function ImageParagraphValue:Set(NewImageParagraphSettings)
+				ImageParagraph.Title.Text = NewImageParagraphSettings.Title
+				ImageParagraph.Content.Text = NewImageParagraphSettings.Content
+				ImageParagraph.Image.Image = NewImageParagraphSettings.Image
+			end
+			
+			Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
+				ImageParagraph.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
+				ImageParagraph.UIStroke.Color = SelectedTheme.SecondaryElementStroke
+			end)
+
+			return ImageParagraphValue
+		end
+
 		-- Input
 		function Tab:CreateInput(InputSettings)
 			local Input = Elements.Template.Input:Clone()
