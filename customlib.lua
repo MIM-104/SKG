@@ -11,7 +11,7 @@ speakingheademoji | Fixing + Custom Theme
 
 
 
-local Release = "Build 1.2"
+local Release = "Build 1.21"
 local RayfieldFolder = "Rayfield"
 local ConfigurationFolder = RayfieldFolder.."/Configurations"
 local ConfigurationExtension = ".rfld"
