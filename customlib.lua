@@ -464,7 +464,6 @@ local function LoadConfiguration(Configuration)
 			end)
 		end
 	end
-	RayfieldLibrary:Notify({Title = "Flags Notice", Content = "All settings have been loaded!"})
 	return
 end
 
