@@ -465,6 +465,7 @@ local function LoadConfiguration(Configuration)
 		end
 	end
 	RayfieldLibrary:Notify({Title = "Flags Notice", Content = "All settings have been loaded!"})
+	return
 end
 
 local function SaveConfiguration()
@@ -2789,6 +2790,7 @@ function RayfieldLibrary:LoadConfiguration()
 			if isfile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension) then
 				LoadConfiguration(readfile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension))
 				RayfieldLibrary:Notify({Title = "Configuration Loaded", Content = "The configuration file for this script has been loaded from a previous session."})
+				return
 			end
 		end)
 	end
