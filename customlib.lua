@@ -1720,9 +1720,9 @@ function RayfieldLibrary:CreateWindow(Settings)
 			local ImageParagraphValue = {}
 
 			local ImageParagraph = Elements.Template.ImageParagraph:Clone()
-			ImageParagraph.Title.Text = ParagraphSettings.Title
-			ImageParagraph.Content.Text = ParagraphSettings.Content
-			ImageParagraph.Image.Image = ParagraphSettings.Image
+			ImageParagraph.Title.Text = ImageParagraphSettings.Title
+			ImageParagraph.Content.Text = ImageParagraphSettings.Content
+			ImageParagraph.Image.Image = ImageParagraphSettings.Image
 			ImageParagraph.Visible = true
 			ImageParagraph.Parent = TabPage
 
@@ -1731,7 +1731,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			ImageParagraph.Title.TextTransparency = 1
 			ImageParagraph.Content.TextTransparency = 1
 			ImageParagraph.Image.ImageTransparency = 1
-			
+	
 			ImageParagraph.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
 			ImageParagraph.UIStroke.Color = SelectedTheme.SecondaryElementStroke
 
@@ -1746,7 +1746,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 				ImageParagraph.Content.Text = NewImageParagraphSettings.Content
 				ImageParagraph.Image.Image = NewImageParagraphSettings.Image
 			end
-			
+	
 			Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
 				ImageParagraph.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
 				ImageParagraph.UIStroke.Color = SelectedTheme.SecondaryElementStroke
@@ -1754,7 +1754,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 			return ImageParagraphValue
 		end
-
+		
 		-- Input
 		function Tab:CreateInput(InputSettings)
 			local Input = Elements.Template.Input:Clone()
