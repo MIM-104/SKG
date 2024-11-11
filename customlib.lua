@@ -252,6 +252,15 @@ end
 -- Interface Management
 local Rayfield = useStudio and script.Parent:FindFirstChild('Rayfield') or game:GetObjects("rbxassetid://134415566685128")[1]
 
+---------------------------------------------------------------------------------------------------------------------------------------- IMPORTANT
+
+local Notifications = Rayfield.Notifications:Clone()
+local a = Instance.new("ScreenGui", game:GetService("CoreGui"))
+a.ResetOnSpawn = false
+Notifications.Parent = a
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
 Rayfield.Enabled = false
 
 if gethui then
@@ -270,6 +279,7 @@ if gethui then
 		if Interface.Name == Rayfield.Name and Interface ~= Rayfield then
 			Interface.Enabled = false
 			Interface.Name = "Rayfield-Old"
+			a:Destroy()
 		end
 	end
 elseif not useStudio then
@@ -277,6 +287,7 @@ elseif not useStudio then
 		if Interface.Name == Rayfield.Name and Interface ~= Rayfield then
 			Interface.Enabled = false
 			Interface.Name = "Rayfield-Old"
+			a:Destroy()
 		end
 	end
 end
@@ -306,16 +317,6 @@ local dragBarCosmetic = dragBar and dragBar.Drag or nil
 
 Rayfield.DisplayOrder = 100
 LoadingFrame.Version.Text = Release
-
----------------------------------------------------------------------------------------------------------------------------------------- IMPORTANT
-
-local Notifications = Rayfield.Notifications:Clone()
-local a = Instance.new("ScreenGui", game:GetService("CoreGui"))
-a.ResetOnSpawn = false
-Notifications.Parent = a
-
-----------------------------------------------------------------------------------------------------------------------------------------
-
 
 
 -- Variables
