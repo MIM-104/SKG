@@ -1773,6 +1773,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Input.UIStroke.Transparency = 1
 			Input.Title.TextTransparency = 1
 			
+			Input.InputFrame.InputBox.Text = InputSettings.CurrentValue or ''
+
 			Input.InputFrame.BackgroundColor3 = SelectedTheme.InputBackground
 			Input.InputFrame.UIStroke.Color = SelectedTheme.InputStroke
 
@@ -1784,17 +1786,17 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Input.InputFrame.Size = UDim2.new(0, Input.InputFrame.InputBox.TextBounds.X + 24, 0, 30)
 
 			Input.InputFrame.InputBox.FocusLost:Connect(function()
-
-
 				local Success, Response = pcall(function()
 					InputSettings.Callback(Input.InputFrame.InputBox.Text)
+					InputSettings.CurrentValue = Input.InputFrame.InputBox.Text
 				end)
+				
 				if not Success then
 					TweenService:Create(Input, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
 					TweenService:Create(Input.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 					Input.Title.Text = "Callback Error"
-					print("Rayfield Callback Error: " ..tostring(Response))
-                    task.wait(0.5)
+					print("Rayfield Callback Error " ..tostring(Response))
+					task.wait(0.5)
 					Input.Title.Text = InputSettings.Name
 					TweenService:Create(Input, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
 					TweenService:Create(Input.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
@@ -1803,6 +1805,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 				if InputSettings.RemoveTextAfterFocusLost then
 					Input.InputFrame.InputBox.Text = ""
 				end
+				
 				SaveConfiguration()
 			end)
 
@@ -1818,16 +1821,22 @@ function RayfieldLibrary:CreateWindow(Settings)
 				TweenService:Create(Input.InputFrame, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = UDim2.new(0, Input.InputFrame.InputBox.TextBounds.X + 24, 0, 30)}):Play()
 			end)
 
-			local InputSettings = {}
-			function InputSettings:Set(text) --Doesnt fire the event
+			function InputSettings:Set(text)
 				Input.InputFrame.InputBox.Text = text
+				SaveConfiguration()
 			end
 			
+			if Settings.ConfigurationSaving then
+				if Settings.ConfigurationSaving.Enabled and InputSettings.Flag then
+					RayfieldLibrary.Flags[InputSettings.Flag] = InputSettings
+				end
+			end
+
 			Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
 				Input.InputFrame.BackgroundColor3 = SelectedTheme.InputBackground
 				Input.InputFrame.UIStroke.Color = SelectedTheme.InputStroke
 			end)
-			
+
 			return InputSettings
 		end
 
@@ -2854,6 +2863,8 @@ if useStudio then
 			-- The variable (Text) is a string for the value in the text box
 		end,
 	})
+	
+	
 
 	RayfieldLibrary:Notify({Title = "Rayfield Interface", Content = "Welcome to Rayfield. These - are the brand new notification design for Rayfield, with custom sizing and Rayfield calculated wait times.", Image = 4483362458})
 
@@ -2902,13 +2913,17 @@ if useStudio then
 
 	local Input = Tab:CreateInput({
 		Name = "Input Example",
+		CurrentValue = "YTyyy",
 		PlaceholderText = "Input Placeholder",
 		RemoveTextAfterFocusLost = false,
+		Flag = 'InputExample',
 		Callback = function(Text)
 			-- The function that takes place when the input is changed
 			-- The variable (Text) is a string for the value in the text box
 		end,
 	})
+	
+	Input:Set('hi')
 
 	local Dropdown = Tab:CreateDropdown({
 		Name = "Dropdown Example",
@@ -2936,6 +2951,8 @@ if useStudio then
 	local Label = Tab:CreateLabel("Label Example")
 
 	local Paragraph = Tab:CreateParagraph({Title = "Paragraph Example", Content = "Paragraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph Example"})
+	
+	local ImageParagraph = Tab:CreateImageParagraph({Title = "Paragraph Example", Content = "Content Example", Image = ""}) -- put the rbxassetid in here
 end
 
 
