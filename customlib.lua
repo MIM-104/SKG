@@ -368,107 +368,79 @@ local function ChangeTheme(ThemeName)
 
 end
 
-local function AddDraggingFunctionality(DragPoint, Main)
-	pcall(function()
-		local Dragging, DragInput, MousePos, FramePos
-
-		DragPoint.InputBegan:Connect(function(Input)
-			if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-				Dragging = true
-				MousePos = Input.Position
-				FramePos = Main.Position
-
-				Input.Changed:Connect(function()
-					if Input.UserInputState == Enum.UserInputState.End then
-						Dragging = false
-					end
-				end)
-			end
-		end)
-
-		DragPoint.InputChanged:Connect(function(Input)
-			if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
-				DragInput = Input
-			end
-		end)
-
-		UserInputService.InputChanged:Connect(function(Input)
-			if Input == DragInput and Dragging then
-				local Delta = Input.Position - MousePos
-				TweenService:Create(Main, TweenInfo.new(0.35, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Position  = UDim2.new(FramePos.X.Scale,FramePos.X.Offset + Delta.X, FramePos.Y.Scale, FramePos.Y.Offset + Delta.Y)}):Play()
-			end
-		end)
-	end)
-end   
-
 local function makeDraggable(object, dragObject, enableTaptic)
-	local dragging = false
-	local relative = nil
+    local dragging = false
+    local relative = nil
+    local dragTween = nil
 
-	local offset = Vector2.zero
-	local screenGui = object:FindFirstAncestorWhichIsA("ScreenGui")
-	if screenGui and screenGui.IgnoreGuiInset then
-		offset += game:GetService('GuiService'):GetGuiInset()
-	end
+    local offset = Vector2.zero
+    local screenGui = object:FindFirstAncestorWhichIsA("ScreenGui")
+    if screenGui and screenGui.IgnoreGuiInset then
+        offset += game:GetService('GuiService'):GetGuiInset()
+    end
 
-	local function connectFunctions()
-		if dragBar and enableTaptic then
-			dragBar.MouseEnter:Connect(function()
-				if not dragging then
-					TweenService:Create(dragBarCosmetic, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundTransparency = 0.5, Size = UDim2.new(0, 120, 0, 4)}):Play()
-				end
-			end)
+    local function connectFunctions()
+        if dragObject and enableTaptic then
+            dragObject.MouseEnter:Connect(function()
+                if not dragging then
+                    TweenService:Create(dragObject, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundTransparency = 0.5, Size = UDim2.new(0, 120, 0, 4)}):Play()
+                end
+            end)
 
-			dragBar.MouseLeave:Connect(function()
-				if not dragging then
-					TweenService:Create(dragBarCosmetic, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundTransparency = 0.7, Size = UDim2.new(0, 100, 0, 4)}):Play()
-				end
-			end)
-		end
-	end
+            dragObject.MouseLeave:Connect(function()
+                if not dragging then
+                    TweenService:Create(dragObject, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundTransparency = 0.7, Size = UDim2.new(0, 100, 0, 4)}):Play()
+                end
+            end)
+        end
+    end
 
-	connectFunctions()
+    connectFunctions()
 
-	dragObject.InputBegan:Connect(function(input, processed)
-		if processed then return end
+    dragObject.InputBegan:Connect(function(input, processed)
+        if processed then return end
 
-		local inputType = input.UserInputType.Name
-		if inputType == "MouseButton1" or inputType == "Touch" then
-			dragging = true
+        local inputType = input.UserInputType.Name
+        if inputType == "MouseButton1" or inputType == "Touch" then
+            dragging = true
 
-			relative = object.AbsolutePosition + object.AbsoluteSize * object.AnchorPoint - UserInputService:GetMouseLocation()
-			if enableTaptic then
-				TweenService:Create(dragBarCosmetic, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 110, 0, 4), BackgroundTransparency = 0}):Play()
-			end
-		end
-	end)
+            relative = object.AbsolutePosition + object.AbsoluteSize * object.AnchorPoint - UserInputService:GetMouseLocation()
+            if enableTaptic then
+                TweenService:Create(dragObject, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 110, 0, 4), BackgroundTransparency = 0}):Play()
+            end
+        end
+    end)
 
-	local inputEnded = UserInputService.InputEnded:Connect(function(input)
-		if not dragging then return end
+    local inputEnded = UserInputService.InputEnded:Connect(function(input)
+        if not dragging then return end
 
-		local inputType = input.UserInputType.Name
-		if inputType == "MouseButton1" or inputType == "Touch" then
-			dragging = false
+        local inputType = input.UserInputType.Name
+        if inputType == "MouseButton1" or inputType == "Touch" then
+            dragging = false
 
-			connectFunctions()
+            connectFunctions()
 
-			if enableTaptic then
-				TweenService:Create(dragBarCosmetic, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 100, 0, 4), BackgroundTransparency = 0.7}):Play()
-			end
-		end
-	end)
+            if enableTaptic then
+                TweenService:Create(dragObject, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 100, 0, 4), BackgroundTransparency = 0.7}):Play()
+            end
+        end
+    end)
 
-	local renderStepped = RunService.RenderStepped:Connect(function()
-		if dragging then
-			local position = UserInputService:GetMouseLocation() + relative + offset
-			object.Position = UDim2.fromOffset(position.X, position.Y)
-		end
-	end)
+    local renderStepped = RunService.RenderStepped:Connect(function()
+        if dragging then
+            local position = UserInputService:GetMouseLocation() + relative + offset
+            if dragTween then
+                dragTween:Cancel()
+            end
+            dragTween = TweenService:Create(object, TweenInfo.new(0.15, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Position = UDim2.fromOffset(position.X, position.Y)})
+            dragTween:Play()
+        end
+    end)
 
-	object.Destroying:Connect(function()
-		if inputEnded then inputEnded:Disconnect() end
-		if renderStepped then renderStepped:Disconnect() end
-	end)
+    object.Destroying:Connect(function()
+        if inputEnded then inputEnded:Disconnect() end
+        if renderStepped then renderStepped:Disconnect() end
+    end)
 end
 
 local function PackColor(Color)
