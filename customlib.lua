@@ -475,7 +475,7 @@ local function LoadConfiguration(Configuration)
 					RayfieldLibrary:Notify({
 						Title = "Configuration Loaded",
 						Content = "The configuration file has been successfully loaded from a previous session.",
-						Image = "91464982890822" -- 6031302926
+						Image = "6031302926"
 					})
 					notificationSent = true
 				end
