@@ -220,7 +220,7 @@ local RayfieldLibrary = {
 			ToggleDisabled = Color3.fromRGB(80, 73, 161), -- Muted for disabled toggle
 			ToggleEnabledStroke = Color3.fromRGB(107, 100, 206), -- Lighter stroke for enabled toggle
 			ToggleDisabledStroke = Color3.fromRGB(97, 90, 196), -- Subtle stroke for disabled
-			ToggleEnabledOuterStroke = Color3.fromRGB(103, 86, 226),
+			ToggleEnabledOuterStroke = Color3.fromRGB(123, 106, 246),
 			ToggleDisabledOuterStroke = Color3.fromRGB(93, 76, 216),
 
 			DropdownSelected = Color3.fromRGB(53, 45, 126), -- Main color for dropdown selection
