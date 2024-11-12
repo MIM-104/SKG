@@ -2791,7 +2791,8 @@ function RayfieldLibrary:LoadConfiguration()
 		if not success or not result then
 			RayfieldLibrary:Notify({
 				Title = "Load Error",
-				Content = "There was an issue loading the configuration file."
+				Content = "There was an issue loading the configuration file.",
+				Image = "6031071053"
 			})
 		end
 	end
