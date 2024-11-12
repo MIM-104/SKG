@@ -2958,11 +2958,6 @@ if useStudio then
 	local ImageParagraph = Tab:CreateImageParagraph({Title = "Paragraph Example", Content = "Content Example", Image = ""}) -- put the id in here
 end
 
-task.spawn(function()
-	local e = game:GetService("CoreGui"):WaitForChild("Rayfield"):WaitForChild("Main"):WaitForChild("Elements"):WaitForChild("Main Farm"):WaitForChild("Select Mobs"):WaitForChild("List")
-	e.Size = UDim2.new(0, 465, 0, 250)
-end)
-
 task.delay(3.5, RayfieldLibrary.LoadConfiguration, RayfieldLibrary)
 
 return RayfieldLibrary
