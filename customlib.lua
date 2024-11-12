@@ -1903,7 +1903,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Dropdown.UIStroke.Transparency = 1
 			Dropdown.Title.TextTransparency = 1
 		
-			Dropdown.Size = UDim2.new(1, -10, 0, 180)
+			Dropdown.Size = UDim2.new(1, -10, 0.8, 0)
 		
 			TweenService:Create(Dropdown, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 			TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
