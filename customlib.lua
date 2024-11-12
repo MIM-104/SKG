@@ -1746,7 +1746,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			local ImageParagraph = Elements.Template.ImageParagraph:Clone()
 			ImageParagraph.Title.Text = ImageParagraphSettings.Title
 			ImageParagraph.Content.Text = ImageParagraphSettings.Content
-			ImageParagraph.Image.Image = ImageParagraphSettings.Image
+			ImageParagraph.Image.Image = "rbxassetid://" .. tostring(ImageParagraphSettings.Image)
 			ImageParagraph.Visible = true
 			ImageParagraph.Parent = TabPage
 
@@ -1768,7 +1768,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			function ImageParagraphValue:Set(NewImageParagraphSettings)
 				ImageParagraph.Title.Text = NewImageParagraphSettings.Title
 				ImageParagraph.Content.Text = NewImageParagraphSettings.Content
-				ImageParagraph.Image.Image = NewImageParagraphSettings.Image
+				ImageParagraph.Image.Image = "rbxassetid://" .. tostring(NewImageParagraphSettings.Image)
 			end
 	
 			Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
