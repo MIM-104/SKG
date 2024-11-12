@@ -2966,7 +2966,7 @@ if useStudio then
 
 	local Paragraph = Tab:CreateParagraph({Title = "Paragraph Example", Content = "Paragraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph ExampleParagraph Example"})
 	
-	local ImageParagraph = Tab:CreateImageParagraph({Title = "Paragraph Example", Content = "Content Example", Image = ""}) -- put the rbxassetid in here
+	local ImageParagraph = Tab:CreateImageParagraph({Title = "Paragraph Example", Content = "Content Example", Image = ""}) -- put the id in here
 end
 
 
