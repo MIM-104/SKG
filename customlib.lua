@@ -177,7 +177,10 @@ end
 -- Object Variables
 
 local Camera = workspace.CurrentCamera
-local Main = Rayfield.Main
+local Main = Rayfield:WaitForChild("Main")
+if Main == nil then
+	warn("CRITICAL ERROR")
+end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 local bpm = 50
