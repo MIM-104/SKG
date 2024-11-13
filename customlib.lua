@@ -177,24 +177,24 @@ end
 -- Object Variables
 
 local Camera = workspace.CurrentCamera
-local Main = Rayfield:WaitForChild("Main")
+local Main = Rayfield:FindFirstChild("Main")
 if Main == nil then
 	warn("CRITICAL ERROR")
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
-local bpm = 50
+local bpm = 20
 local beatInterval = 60 / bpm  -- Time for each pulse in seconds
 
 local tweenInfo = TweenInfo.new(
 	beatInterval / 2,
 	Enum.EasingStyle.Quad,
-	Enum.EasingDirection.Out,
+	Enum.EasingDirection.InOut,
 	-1,
 	true
 )
 
-local pulseColour = Color3.fromRGB(67, 58, 161)
+local pulseColour = Color3.fromRGB(63, 55, 152)
 
 game:GetService("TweenService"):Create(Main, tweenInfo, {BackgroundColor3 = pulseColour}):Play()
 --------------------------------------------------------------------------------------------------------------------------------------------------------
