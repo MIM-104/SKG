@@ -64,7 +64,7 @@ local RayfieldLibrary = {
         Custom = {
 			TextColor = Color3.fromRGB(200, 200, 255), -- Light text for readability on dark background
 
-			Background = Color3.fromRGB(35, 30, 85), -- Deep background to match the dark blue-purple tone
+			Background = Color3.fromRGB(61, 52, 144), -- Deep background to match the dark blue-purple tone
 			Topbar = Color3.fromRGB(45, 40, 100), -- Slightly lighter for the top bar
 			Shadow = Color3.fromRGB(25, 20, 70), -- Subtle shadow for depth
 
@@ -183,12 +183,12 @@ if Main == nil then
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
-local bpm = 20
+local bpm = 5
 local beatInterval = 60 / bpm  -- Time for each pulse in seconds
 
 local tweenInfo = TweenInfo.new(
 	beatInterval / 2,
-	Enum.EasingStyle.Quad,
+	Enum.EasingStyle.Sine,
 	Enum.EasingDirection.InOut,
 	-1,
 	true
