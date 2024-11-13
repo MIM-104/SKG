@@ -12,7 +12,7 @@ speakingheademoji | Fixing + Custom Theme
 
 
 local Release = "Custom Build"
-local RayfieldFolder = "RayfieldForExpensive"
+local RayfieldFolder = "EXPENSIVECOREFOLDER"
 local ConfigurationFolder = RayfieldFolder.."/Configurations"
 local ConfigurationExtension = ".txt"
 
