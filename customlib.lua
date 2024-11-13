@@ -184,7 +184,7 @@ end
 local Topbar = Main.Topbar
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
-local bpm = 20
+local bpm = 30
 local beatInterval = 60 / bpm
 local holdTime = 2
 local initialColour = Main.BackgroundColor3
