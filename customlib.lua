@@ -31,7 +31,7 @@ task.spawn(function()
 	--local baseColour = Color3.fromRGB(61, 52, 144)
 	local pulseColour = Color3.fromRGB(69, 60, 166)
 
-	local colorTween = tweenService:Create(game:GetService("CoreGui"):WaitForChild("Rayfield"):WaitForChild("Main"), tweenInfo, {BackgroundColor3 = pulseColour}):Play()
+	game:GetService("TweenService"):Create(game:GetService("CoreGui"):WaitForChild("Rayfield"):WaitForChild("Main"), tweenInfo, {BackgroundColor3 = pulseColour}):Play()
 end)
 
 local RayfieldLibrary = {
