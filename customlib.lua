@@ -183,7 +183,7 @@ if Main == nil then
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
-local bpm = 5
+local bpm = 8
 local beatInterval = 60 / bpm  -- Time for each pulse in seconds
 
 local tweenInfo = TweenInfo.new(
@@ -194,7 +194,7 @@ local tweenInfo = TweenInfo.new(
 	true
 )
 
-local pulseColour = Color3.fromRGB(63, 55, 152)
+local pulseColour = Color3.fromRGB(68, 60, 165)
 
 game:GetService("TweenService"):Create(Main, tweenInfo, {BackgroundColor3 = pulseColour}):Play()
 --------------------------------------------------------------------------------------------------------------------------------------------------------
