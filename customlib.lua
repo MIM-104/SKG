@@ -2660,27 +2660,20 @@ end
 function RayfieldLibrary:LoadConfiguration()
 	if CEnabled then
 		notificationSent = false
-		local configFile = ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension
-
-		if not isfile(configFile) then
-			RayfieldLibrary:Notify({
-				Title = "Initialization Complete",
-				Content = "No configuration file found. Everything has been initialized.",
-				Image = "6023426911"
-			})
-		else
-			local success, result = pcall(function()
+		local success, result = pcall(function()
+			local configFile = ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension
+			if isfile(configFile) then
 				LoadConfiguration(readfile(configFile))
 				return true
-			end)
-
-			if not success or not result then
-				RayfieldLibrary:Notify({
-					Title = "Load Error",
-					Content = "There was an issue loading the configuration file.",
-					Image = "6031071053"
-				})
 			end
+		end)
+
+		if not success or not result then
+			RayfieldLibrary:Notify({
+				Title = "Load Error",
+				Content = "There was an issue loading the configuration file.",
+				Image = "6031071053"
+			})
 		end
 	end
 end
