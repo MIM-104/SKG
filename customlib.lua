@@ -183,20 +183,38 @@ if Main == nil then
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
-local bpm = 8
-local beatInterval = 60 / bpm  -- Time for each pulse in seconds
+local bpm = 20
+local beatInterval = 60 / bpm
+local holdTime = 2
+local initialColor = Main.BackgroundColor3
+local pulseColour = Color3.fromRGB(77, 67, 186)
 
-local tweenInfo = TweenInfo.new(
-	beatInterval / 2,
-	Enum.EasingStyle.Sine,
-	Enum.EasingDirection.InOut,
-	-1,
-	true
-)
+local function pulseCycle()
+    local tweenToColor = game:GetService("TweenService"):Create(
+        Main,
+        TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+        {BackgroundColor3 = pulseColour}
+    )
+    
+    tweenToColor:Play()
+    tweenToColor.Completed:Wait()
+    task.wait(holdTime)
 
-local pulseColour = Color3.fromRGB(68, 60, 165)
+    local tweenToOriginal = game:GetService("TweenService"):Create(
+        Main,
+        TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+        {BackgroundColor3 = initialColor}
+    )
+    
+    tweenToOriginal:Play()
+    tweenToOriginal.Completed:Wait()
+end
 
-game:GetService("TweenService"):Create(Main, tweenInfo, {BackgroundColor3 = pulseColour}):Play()
+task.spawn(function()
+    while true do
+        pulseCycle()
+    end
+end)
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local MPrompt = Rayfield:FindFirstChild('Prompt')
