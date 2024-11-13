@@ -187,39 +187,54 @@ local Topbar = Main.Topbar
 local bpm = 20
 local beatInterval = 60 / bpm
 local holdTime = 2
-local initialColor = Main.BackgroundColor3
+local initialColour = Main.BackgroundColor3
+local initialColour2 = Main.Topbar.BackgroundColor3
 local pulseColour = Color3.fromRGB(69, 60, 167)
+local pulseColour2 = Color3.fromRGB(59, 55, 153)
+
+local tweenToColor = game:GetService("TweenService"):Create(
+    Main,
+    TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+    {BackgroundColor3 = pulseColour}
+)
+local tweenToColor2 = game:GetService("TweenService"):Create(
+    Topbar,
+    TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+    {BackgroundColor3 = pulseColour2}
+)
+local tweenToColor3 = game:GetService("TweenService"):Create(
+    Topbar.CornerRepair,
+    TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+    {BackgroundColor3 = pulseColour2}
+)
+
+local tweenToOriginal = game:GetService("TweenService"):Create(
+    Main,
+    TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+    {BackgroundColor3 = initialColour}
+)
+local tweenToOriginal2 = game:GetService("TweenService"):Create(
+    Topbar,
+    TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+    {BackgroundColor3 = initialColour2}
+)
+local tweenToOriginal3 = game:GetService("TweenService"):Create(
+    Topbar.CornerRepair,
+    TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+    {BackgroundColor3 = initialColour2}
+)
 
 local function pulseCycle()
-    local tweenToColor = game:GetService("TweenService"):Create(
-        Main,
-        TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
-        {BackgroundColor3 = pulseColour}
-    )
-	local tweenToColor2 = game:GetService("TweenService"):Create(
-        Topbar,
-        TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
-        {BackgroundColor3 = pulseColour}
-    )
     
     tweenToColor:Play()
 	tweenToColor2:Play()
+	tweenToColor3:Play()
     tweenToColor.Completed:Wait()
     task.wait(holdTime)
-
-    local tweenToOriginal = game:GetService("TweenService"):Create(
-        Main,
-        TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
-        {BackgroundColor3 = initialColor}
-    )
-	local tweenToOriginal2 = game:GetService("TweenService"):Create(
-        Topbar,
-        TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
-        {BackgroundColor3 = initialColor}
-    )
     
     tweenToOriginal:Play()
 	tweenToOriginal2:Play()
+	tweenToOriginal3:Play()
     tweenToOriginal.Completed:Wait()
 	task.wait(holdTime)
 end
