@@ -338,6 +338,10 @@ local function LoadConfiguration(Configuration)
 					if Flag.Color ~= FlagValue then
 						Flag:Set(UnpackColor(FlagValue))
 					end
+				elseif Flag.Type == "Dropdown" then
+					if Flag.CurrentOption ~= FlagValue then
+						Flag:Set(FlagValue)
+					end
 				else
 					local current = Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption
 					if current ~= FlagValue then
@@ -365,6 +369,8 @@ local function SaveConfiguration()
 	for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
 		if Flag.Type == "ColorPicker" then
 			Data[FlagName] = PackColor(Flag.Color)
+		elseif Flag.Type == "Dropdown" then
+			Data[FlagName] = Flag.CurrentOption
 		else
 			Data[FlagName] = Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color
 		end
@@ -844,7 +850,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Settings.ConfigurationSaving.FileName = tostring(game.PlaceId)
 		end
 		if not isfolder(RayfieldFolder.."/".."Configuration Folders") then
-
+			makefolder(RayfieldFolder.."/Configuration Folders")
 		end
 		if Settings.ConfigurationSaving.Enabled == nil then
 			Settings.ConfigurationSaving.Enabled = false
@@ -852,7 +858,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 		CFileName = Settings.ConfigurationSaving.FileName
 		ConfigurationFolder = Settings.ConfigurationSaving.FolderName or ConfigurationFolder
 		CEnabled = Settings.ConfigurationSaving.Enabled
-
+	
 		if Settings.ConfigurationSaving.Enabled then
 			if not isfolder(ConfigurationFolder) then
 				makefolder(ConfigurationFolder)
@@ -2831,7 +2837,5 @@ if useStudio then
 	
 	local ImageParagraph = Tab:CreateImageParagraph({Title = "Paragraph Example", Content = "Content Example", Image = ""}) -- put the id in here
 end
-
-task.delay(3.5, RayfieldLibrary.LoadConfiguration, RayfieldLibrary)
 
 return RayfieldLibrary
