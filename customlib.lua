@@ -181,6 +181,7 @@ local Main = Rayfield:FindFirstChild("Main")
 if Main == nil then
 	warn("CRITICAL ERROR")
 end
+local Topbar = Main.Topbar
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 local bpm = 20
@@ -190,24 +191,36 @@ local initialColor = Main.BackgroundColor3
 local pulseColour = Color3.fromRGB(69, 60, 167)
 
 local function pulseCycle()
-	local tweenToColor = game:GetService("TweenService"):Create(
-		Main,
-		TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
-		{BackgroundColor3 = pulseColour}
-	)
+    local tweenToColor = game:GetService("TweenService"):Create(
+        Main,
+        TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+        {BackgroundColor3 = pulseColour}
+    )
+	local tweenToColor2 = game:GetService("TweenService"):Create(
+        Topbar,
+        TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+        {BackgroundColor3 = pulseColour}
+    )
     
-	tweenToColor:Play()
-	tweenToColor.Completed:Wait()
-	task.wait(holdTime)
+    tweenToColor:Play()
+	tweenToColor2:Play()
+    tweenToColor.Completed:Wait()
+    task.wait(holdTime)
 
-	local tweenToOriginal = game:GetService("TweenService"):Create(
-		Main,
-		TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
-		{BackgroundColor3 = initialColor}
-	)
+    local tweenToOriginal = game:GetService("TweenService"):Create(
+        Main,
+        TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+        {BackgroundColor3 = initialColor}
+    )
+	local tweenToOriginal2 = game:GetService("TweenService"):Create(
+        Topbar,
+        TweenInfo.new(beatInterval / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+        {BackgroundColor3 = initialColor}
+    )
     
-	tweenToOriginal:Play()
-	tweenToOriginal.Completed:Wait()
+    tweenToOriginal:Play()
+	tweenToOriginal2:Play()
+    tweenToOriginal.Completed:Wait()
 	task.wait(holdTime)
 end
 
@@ -219,7 +232,6 @@ end)
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local MPrompt = Rayfield:FindFirstChild('Prompt')
-local Topbar = Main.Topbar
 local Elements = Main.Elements
 local LoadingFrame = Main.LoadingFrame
 local TabList = Main.TabList
