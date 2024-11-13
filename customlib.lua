@@ -180,7 +180,7 @@ local Camera = workspace.CurrentCamera
 local Main = Rayfield.Main
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
-local bpm = 80
+local bpm = 50
 local beatInterval = 60 / bpm  -- Time for each pulse in seconds
 
 local tweenInfo = TweenInfo.new(
@@ -191,7 +191,7 @@ local tweenInfo = TweenInfo.new(
 	true
 )
 
-local pulseColour = Color3.fromRGB(69, 60, 166)
+local pulseColour = Color3.fromRGB(67, 58, 161)
 
 game:GetService("TweenService"):Create(Main, tweenInfo, {BackgroundColor3 = pulseColour}):Play()
 --------------------------------------------------------------------------------------------------------------------------------------------------------
