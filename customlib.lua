@@ -178,6 +178,24 @@ end
 
 local Camera = workspace.CurrentCamera
 local Main = Rayfield.Main
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+local bpm = 80
+local beatInterval = 60 / bpm  -- Time for each pulse in seconds
+
+local tweenInfo = TweenInfo.new(
+	beatInterval / 2,
+	Enum.EasingStyle.Quad,
+	Enum.EasingDirection.InOut,
+	-1,
+	true
+)
+
+local pulseColour = Color3.fromRGB(69, 60, 166)
+
+game:GetService("TweenService"):Create(Main, tweenInfo, {BackgroundColor3 = pulseColour}):Play()
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
 local MPrompt = Rayfield:FindFirstChild('Prompt')
 local Topbar = Main.Topbar
 local Elements = Main.Elements
@@ -203,23 +221,6 @@ local searchOpen = false
 local Notifications = Rayfield.Notifications
 
 local SelectedTheme = RayfieldLibrary.Theme.Custom
-
-task.spawn(function()
-	local bpm = 80
-	local beatInterval = 60 / bpm  -- Time for each pulse in seconds
-
-	local tweenInfo = TweenInfo.new(
-		beatInterval / 2,
-		Enum.EasingStyle.Quad,
-		Enum.EasingDirection.InOut,
-		-1,
-		true
-	)
-
-	local pulseColour = Color3.fromRGB(69, 60, 166)
-
-	TweenService:Create(Main, tweenInfo, {BackgroundColor3 = pulseColour}):Play()
-end)
 
 
 local function ChangeTheme(ThemeName)
