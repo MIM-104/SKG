@@ -16,24 +16,6 @@ local RayfieldFolder = "EXPENSIVECOREFOLDER"
 local ConfigurationFolder = RayfieldFolder.."/Configurations"
 local ConfigurationExtension = ".txt"
 
-task.spawn(function()
-	local bpm = 80
-	local beatInterval = 60 / bpm  -- Time for each pulse in seconds
-
-	local tweenInfo = TweenInfo.new(
-    	beatInterval / 2,
-    	Enum.EasingStyle.Quad,
-    	Enum.EasingDirection.InOut,
-    	-1,
-    	true
-	)
-
-	--local baseColour = Color3.fromRGB(61, 52, 144)
-	local pulseColour = Color3.fromRGB(69, 60, 166)
-
-	game:GetService("TweenService"):Create(game:GetService("CoreGui"):WaitForChild("Rayfield"):WaitForChild("Main"), tweenInfo, {BackgroundColor3 = pulseColour}):Play()
-end)
-
 local RayfieldLibrary = {
 	Flags = {},
 	Theme = {
@@ -221,6 +203,24 @@ local searchOpen = false
 local Notifications = Rayfield.Notifications
 
 local SelectedTheme = RayfieldLibrary.Theme.Custom
+
+task.spawn(function()
+	local bpm = 80
+	local beatInterval = 60 / bpm  -- Time for each pulse in seconds
+
+	local tweenInfo = TweenInfo.new(
+		beatInterval / 2,
+		Enum.EasingStyle.Quad,
+		Enum.EasingDirection.InOut,
+		-1,
+		true
+	)
+
+	local pulseColour = Color3.fromRGB(69, 60, 166)
+
+	TweenService:Create(Main, tweenInfo, {BackgroundColor3 = pulseColour}):Play()
+end)
+
 
 local function ChangeTheme(ThemeName)
 	SelectedTheme = RayfieldLibrary.Theme[ThemeName]
