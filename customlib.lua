@@ -16,7 +16,23 @@ local RayfieldFolder = "EXPENSIVECOREFOLDER"
 local ConfigurationFolder = RayfieldFolder.."/Configurations"
 local ConfigurationExtension = ".txt"
 
+task.spawn(function()
+	local bpm = 80
+	local beatInterval = 60 / bpm  -- Time for each pulse in seconds
 
+	local tweenInfo = TweenInfo.new(
+    	beatInterval / 2,
+    	Enum.EasingStyle.Quad,
+    	Enum.EasingDirection.InOut,
+    	-1,
+    	true
+	)
+
+	local baseColour = Color3.fromRGB(61, 52, 144)
+	local pulseColour = Color3.fromRGB(69, 60, 166)
+
+	local colorTween = tweenService:Create(frame, tweenInfo, {BackgroundColor3 = pulseColor}):Play()
+end)
 
 local RayfieldLibrary = {
 	Flags = {},
