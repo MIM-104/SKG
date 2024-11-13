@@ -186,7 +186,7 @@ local beatInterval = 60 / bpm  -- Time for each pulse in seconds
 local tweenInfo = TweenInfo.new(
 	beatInterval / 2,
 	Enum.EasingStyle.Quad,
-	Enum.EasingDirection.InOut,
+	Enum.EasingDirection.Out,
 	-1,
 	true
 )
