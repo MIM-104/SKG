@@ -187,7 +187,7 @@ local bpm = 20
 local beatInterval = 60 / bpm
 local holdTime = 2
 local initialColor = Main.BackgroundColor3
-local pulseColour = Color3.fromRGB(77, 67, 186)
+local pulseColour = Color3.fromRGB(69, 60, 167)
 
 local function pulseCycle()
     local tweenToColor = game:GetService("TweenService"):Create(
@@ -208,6 +208,7 @@ local function pulseCycle()
     
     tweenToOriginal:Play()
     tweenToOriginal.Completed:Wait()
+	task.wait(holdTime)
 end
 
 task.spawn(function()
