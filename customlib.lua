@@ -134,6 +134,7 @@ if gethui then
 		if Interface.Name == Rayfield.Name and Interface ~= Rayfield then
 			Interface.Enabled = false
 			Interface.Name = "Rayfield-Old"
+			SaveConfiguration()
 			a:Destroy()
 		end
 	end
@@ -142,6 +143,7 @@ elseif not useStudio then
 		if Interface.Name == Rayfield.Name and Interface ~= Rayfield then
 			Interface.Enabled = false
 			Interface.Name = "Rayfield-Old"
+			SaveConfiguration()
 			a:Destroy()
 		end
 	end
