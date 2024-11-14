@@ -129,6 +129,37 @@ Notifications.Parent = a
 Rayfield.Enabled = false
 Rayfield.Parent = CoreGui
 
+-- Variables
+
+local request = (syn and syn.request) or (http and http.request) or http_request
+local CFileName = nil
+local CEnabled = false
+local Minimised = false
+local Hidden = false
+local Debounce = false
+local searchOpen = false
+local Notifications = Rayfield.Notifications
+
+local SelectedTheme = RayfieldLibrary.Theme.Custom
+
+local function SaveConfiguration()
+	if not CEnabled then return end
+
+	local Data = {}
+	for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
+		if Flag.Type == "ColorPicker" then
+			Data[FlagName] = PackColor(Flag.Color)
+		elseif Flag.Type == "Dropdown" then
+			Data[FlagName] = Flag.CurrentOption
+		else
+			Data[FlagName] = Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color
+		end
+	end
+
+	local configFile = ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension
+	writefile(configFile, HttpService:JSONEncode(Data))
+end
+
 if gethui then
 	for _, Interface in ipairs(gethui():GetChildren()) do
 		if Interface.Name == Rayfield.Name and Interface ~= Rayfield then
@@ -237,20 +268,6 @@ Rayfield.DisplayOrder = 100
 LoadingFrame.Version.Text = Release
 
 
--- Variables
-
-local request = (syn and syn.request) or (http and http.request) or http_request
-local CFileName = nil
-local CEnabled = false
-local Minimised = false
-local Hidden = false
-local Debounce = false
-local searchOpen = false
-local Notifications = Rayfield.Notifications
-
-local SelectedTheme = RayfieldLibrary.Theme.Custom
-
-
 local function ChangeTheme(ThemeName)
 	SelectedTheme = RayfieldLibrary.Theme[ThemeName]
 
@@ -330,24 +347,6 @@ local function LoadConfiguration(Configuration)
 			end)
 		end
 	end
-end
-
-local function SaveConfiguration()
-	if not CEnabled then return end
-
-	local Data = {}
-	for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
-		if Flag.Type == "ColorPicker" then
-			Data[FlagName] = PackColor(Flag.Color)
-		elseif Flag.Type == "Dropdown" then
-			Data[FlagName] = Flag.CurrentOption
-		else
-			Data[FlagName] = Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color
-		end
-	end
-
-	local configFile = ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension
-	writefile(configFile, HttpService:JSONEncode(Data))
 end
 
 function RayfieldLibrary:Notify(data) -- action e.g open messages
