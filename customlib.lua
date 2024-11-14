@@ -129,17 +129,23 @@ Notifications.Parent = a
 Rayfield.Enabled = false
 Rayfield.Parent = CoreGui
 
-for _, Interface in ipairs(CoreGui:GetChildren()) do
-	if Interface.Name == Rayfield.Name and Interface ~= Rayfield then
-		Interface.Enabled = false
-		Interface.Name = "Rayfield-Old"
-		a:Destroy()
-		task.delay(5, function()
-			Interface:Destroy()
-		end)
+if gethui then
+	for _, Interface in ipairs(gethui():GetChildren()) do
+		if Interface.Name == Rayfield.Name and Interface ~= Rayfield then
+			Interface.Enabled = false
+			Interface.Name = "Rayfield-Old"
+			a:Destroy()
+		end
+	end
+elseif not useStudio then
+	for _, Interface in ipairs(CoreGui:GetChildren()) do
+		if Interface.Name == Rayfield.Name and Interface ~= Rayfield then
+			Interface.Enabled = false
+			Interface.Name = "Rayfield-Old"
+			a:Destroy()
+		end
 	end
 end
-
 
 local minSize = Vector2.new(1024, 768)
 local useMobileSizing
