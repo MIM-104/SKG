@@ -2724,6 +2724,9 @@ function RayfieldLibrary:LoadConfiguration()
 	end
 end
 
-LoadConfiguration()
+local configFile = ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension
+if configFile then
+	LoadConfiguration(readfile(configFile))
+end
 
 return RayfieldLibrary
