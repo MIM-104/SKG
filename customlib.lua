@@ -142,6 +142,14 @@ local Notifications = Rayfield.Notifications
 
 local SelectedTheme = RayfieldLibrary.Theme.Custom
 
+local function PackColor(Color)
+	return {R = Color.R * 255, G = Color.G * 255, B = Color.B * 255}
+end    
+
+local function UnpackColor(Color)
+	return Color3.fromRGB(Color.R, Color.G, Color.B)
+end
+
 local function SaveConfiguration()
 	if not CEnabled then return end
 
@@ -304,14 +312,6 @@ local function ChangeTheme(ThemeName)
 		end
 	end
 
-end
-
-local function PackColor(Color)
-	return {R = Color.R * 255, G = Color.G * 255, B = Color.B * 255}
-end    
-
-local function UnpackColor(Color)
-	return Color3.fromRGB(Color.R, Color.G, Color.B)
 end
 
 local notificationSent = false  -- Flag
@@ -831,6 +831,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 	end)
 
 	local dragBar = Main:FindFirstChild('Drag')
+	dragBar.Visible = false
 	local dragInteract = dragBar and dragBar.Interact or nil
 	local dragBarCosmetic = dragBar and dragBar.Drag or nil
 
@@ -2524,8 +2525,10 @@ function RayfieldLibrary:CreateWindow(Settings)
 	TweenService:Create(LoadingFrame.Title, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 	TweenService:Create(LoadingFrame.Subtitle, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 	TweenService:Create(LoadingFrame.Version, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
-	task.wait(0.2)
-	TweenService:Create(Main, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Size = useMobileSizing and UDim2.new(0, 500, 0, 275) or UDim2.new(0, 500, 0, 475)}):Play()
+	task.wait(0.3)
+	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 500, 0, 247)}):Play()
+    task.wait(0.3)
+    TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 500, 0, 475)}):Play()
 	TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.6}):Play()
 
 	Topbar.BackgroundTransparency = 1
@@ -2555,8 +2558,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 	task.wait(0.3)
 
 	if dragBar then
-		dragBar.Visible = true
 		dragBarCosmetic.Transparency = 1
+		dragBar.Visible = true
 		TweenService:Create(dragBarCosmetic, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.7}):Play()
 	end
 	
