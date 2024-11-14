@@ -237,6 +237,20 @@ Rayfield.DisplayOrder = 100
 LoadingFrame.Version.Text = Release
 
 
+-- Variables
+
+local request = (syn and syn.request) or (http and http.request) or http_request
+local CFileName = nil
+local CEnabled = false
+local Minimised = false
+local Hidden = false
+local Debounce = false
+local searchOpen = false
+local Notifications = Rayfield.Notifications
+
+local SelectedTheme = RayfieldLibrary.Theme.Custom
+
+
 local function ChangeTheme(ThemeName)
 	SelectedTheme = RayfieldLibrary.Theme[ThemeName]
 
@@ -281,38 +295,7 @@ local function UnpackColor(Color)
 	return Color3.fromRGB(Color.R, Color.G, Color.B)
 end
 
--- Variables
-
-local request = (syn and syn.request) or (http and http.request) or http_request
-local CFileName = nil
-local CEnabled = false
-local Minimised = false
-local Hidden = false
-local Debounce = false
-local searchOpen = false
-local Notifications = Rayfield.Notifications
-
-local SelectedTheme = RayfieldLibrary.Theme.Custom
-
-local function SaveConfiguration()
-	if not CEnabled then return end
-
-	local Data = {}
-	for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
-		if Flag.Type == "ColorPicker" then
-			Data[FlagName] = PackColor(Flag.Color)
-		elseif Flag.Type == "Dropdown" then
-			Data[FlagName] = Flag.CurrentOption
-		else
-			Data[FlagName] = Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color
-		end
-	end
-
-	local configFile = ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension
-	writefile(configFile, HttpService:JSONEncode(Data))
-end
-
-
+local notificationSent = false  -- Flag
 
 local function LoadConfiguration(Configuration)
 	local Data = HttpService:JSONDecode(Configuration)
@@ -336,14 +319,35 @@ local function LoadConfiguration(Configuration)
 					end
 				end
 				
-				RayfieldLibrary:Notify({
-					Title = "Configuration Loaded",
-					Content = "The configuration file has been successfully loaded from a previous session.",
-					Image = "6031302926"
-				})
+				if not notificationSent then
+					RayfieldLibrary:Notify({
+						Title = "Configuration Loaded",
+						Content = "The configuration file has been successfully loaded from a previous session.",
+						Image = "6031302926"
+					})
+					notificationSent = true
+				end
 			end)
 		end
 	end
+end
+
+local function SaveConfiguration()
+	if not CEnabled then return end
+
+	local Data = {}
+	for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
+		if Flag.Type == "ColorPicker" then
+			Data[FlagName] = PackColor(Flag.Color)
+		elseif Flag.Type == "Dropdown" then
+			Data[FlagName] = Flag.CurrentOption
+		else
+			Data[FlagName] = Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color
+		end
+	end
+
+	local configFile = ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension
+	writefile(configFile, HttpService:JSONEncode(Data))
 end
 
 function RayfieldLibrary:Notify(data) -- action e.g open messages
@@ -2699,6 +2703,7 @@ end
 
 function RayfieldLibrary:LoadConfiguration()
 	if CEnabled then
+		notificationSent = false
 		local configFile = ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension
 
 		if not isfile(configFile) then
