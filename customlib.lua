@@ -226,9 +226,6 @@ local MPrompt = Rayfield:FindFirstChild('Prompt')
 local Elements = Main.Elements
 local LoadingFrame = Main.LoadingFrame
 local TabList = Main.TabList
-local dragBar = Main:FindFirstChild('Drag')
-local dragInteract = dragBar and dragBar.Interact or nil
-local dragBarCosmetic = dragBar and dragBar.Drag or nil
 
 Rayfield.DisplayOrder = 100
 LoadingFrame.Version.Text = Release
@@ -282,81 +279,6 @@ local function ChangeTheme(ThemeName)
 		end
 	end
 
-end
-
-local function makeDraggable(object, dragObject, enableTaptic)
-    local dragging = false
-    local relative = nil
-    local dragTween = nil
-
-    local offset = Vector2.zero
-    local screenGui = object:FindFirstAncestorWhichIsA("ScreenGui")
-    if screenGui and screenGui.IgnoreGuiInset then
-        offset += game:GetService('GuiService'):GetGuiInset()
-    end
-
-    local function connectFunctions()
-        if dragObject and enableTaptic then
-            dragObject.MouseEnter:Connect(function()
-                if not dragging then
-                    TweenService:Create(dragObject, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundTransparency = 0.5, Size = UDim2.new(0, 120, 0, 4)}):Play()
-                end
-            end)
-
-            dragObject.MouseLeave:Connect(function()
-                if not dragging then
-                    TweenService:Create(dragObject, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundTransparency = 0.7, Size = UDim2.new(0, 100, 0, 4)}):Play()
-                end
-            end)
-        end
-    end
-
-    connectFunctions()
-
-    dragObject.InputBegan:Connect(function(input, processed)
-        if processed then return end
-
-        local inputType = input.UserInputType.Name
-        if inputType == "MouseButton1" or inputType == "Touch" then
-            dragging = true
-
-            relative = object.AbsolutePosition + object.AbsoluteSize * object.AnchorPoint - UserInputService:GetMouseLocation()
-            if enableTaptic then
-                TweenService:Create(dragObject, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 110, 0, 4), BackgroundTransparency = 0}):Play()
-            end
-        end
-    end)
-
-    local inputEnded = UserInputService.InputEnded:Connect(function(input)
-        if not dragging then return end
-
-        local inputType = input.UserInputType.Name
-        if inputType == "MouseButton1" or inputType == "Touch" then
-            dragging = false
-
-            connectFunctions()
-
-            if enableTaptic then
-                TweenService:Create(dragObject, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 100, 0, 4), BackgroundTransparency = 0.7}):Play()
-            end
-        end
-    end)
-
-    local renderStepped = RunService.RenderStepped:Connect(function()
-        if dragging then
-            local position = UserInputService:GetMouseLocation() + relative + offset
-            if dragTween then
-                dragTween:Cancel()
-            end
-            dragTween = TweenService:Create(object, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Position = UDim2.fromOffset(position.X, position.Y)})
-            dragTween:Play()
-        end
-    end)
-
-    object.Destroying:Connect(function()
-        if inputEnded then inputEnded:Disconnect() end
-        if renderStepped then renderStepped:Disconnect() end
-    end)
 end
 
 local function PackColor(Color)
@@ -855,13 +777,6 @@ function RayfieldLibrary:CreateWindow(Settings)
 		LoadingFrame.Version.Text = "Rayfield Custom UI"
 	end
 
-	if dragBar then
-		dragBar.Visible = false
-		dragBarCosmetic.BackgroundTransparency = 1
-		dragBar.Visible = true
-	end
-
-
 	if Settings.Theme then
 		local success = pcall(ChangeTheme, Settings.Theme)
 		if not success then
@@ -907,6 +822,85 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end	
 		end
 	end)
+
+	local dragBar = Main:FindFirstChild('Drag')
+	local dragInteract = dragBar and dragBar.Interact or nil
+	local dragBarCosmetic = dragBar and dragBar.Drag or nil
+
+	local function makeDraggable(object, dragObject, enableTaptic)
+		local dragging = false
+		local relative = nil
+		local dragTween = nil
+	
+		local offset = Vector2.zero
+		local screenGui = object:FindFirstAncestorWhichIsA("ScreenGui")
+		if screenGui and screenGui.IgnoreGuiInset then
+			offset += game:GetService('GuiService'):GetGuiInset()
+		end
+	
+		local function connectFunctions()
+			if dragObject and enableTaptic then
+				dragObject.MouseEnter:Connect(function()
+					if not dragging then
+						TweenService:Create(dragBarCosmetic, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundTransparency = 0.5, Size = UDim2.new(0.75, 0, 0.2, 0)}):Play()
+					end
+				end)
+	
+				dragObject.MouseLeave:Connect(function()
+					if not dragging then
+						TweenService:Create(dragBarCosmetic, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundTransparency = 0.7, Size = UDim2.new(0.667, 0, 0.2, 0)}):Play()
+					end
+				end)
+			end
+		end
+	
+		connectFunctions()
+	
+		dragObject.InputBegan:Connect(function(input, processed)
+			if processed then return end
+	
+			local inputType = input.UserInputType.Name
+			if inputType == "MouseButton1" or inputType == "Touch" then
+				dragging = true
+	
+				relative = object.AbsolutePosition + object.AbsoluteSize * object.AnchorPoint - UserInputService:GetMouseLocation()
+				if enableTaptic then
+					TweenService:Create(dragBarCosmetic, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0.75, 0, 0.2, 0), BackgroundTransparency = 0}):Play()
+				end
+			end
+		end)
+	
+		local inputEnded = UserInputService.InputEnded:Connect(function(input)
+			if not dragging then return end
+	
+			local inputType = input.UserInputType.Name
+			if inputType == "MouseButton1" or inputType == "Touch" then
+				dragging = false
+	
+				connectFunctions()
+	
+				if enableTaptic then
+					TweenService:Create(dragBarCosmetic, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0.667, 0, 0.2, 0), BackgroundTransparency = 0.7}):Play()
+				end
+			end
+		end)
+	
+		local renderStepped = RunService.RenderStepped:Connect(function()
+			if dragging then
+				local position = UserInputService:GetMouseLocation() + relative + offset
+				if dragTween then
+					dragTween:Cancel()
+				end
+				dragTween = TweenService:Create(object, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Position = UDim2.fromOffset(position.X, position.Y)})
+				dragTween:Play()
+			end
+		end)
+	
+		object.Destroying:Connect(function()
+			if inputEnded then inputEnded:Disconnect() end
+			if renderStepped then renderStepped:Disconnect() end
+		end)
+	end
 
 	makeDraggable(Main, Topbar)
 	if dragBar then makeDraggable(Main, dragInteract, true) end
@@ -2554,6 +2548,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 	task.wait(0.3)
 
 	if dragBar then
+		dragBar.Visible = true
+		dragBarCosmetic.Transparency = 1
 		TweenService:Create(dragBarCosmetic, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.7}):Play()
 	end
 	
