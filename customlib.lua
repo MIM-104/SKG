@@ -2458,29 +2458,29 @@ function RayfieldLibrary:CreateWindow(Settings)
 	Elements.Visible = true
 
 	for _ = 1, 3 do
-    	for i = 1, 10 do
-        	if Main and Main.UIGradient then
-            	local offset = Main.UIGradient.Offset
-            	offset = UDim2.new(offset.X.Scale + 0.1 / 10, 0, offset.Y.Scale, 0)
-            	Main.UIGradient.Offset = offset
-        	end
-        	task.wait(0.05)
-    	end
+		for i = 1, 10 do
+			if Main and Main.UIGradient then
+				local offset = Main.UIGradient.Offset
+				offset = Vector2.new(offset.X + 0.1 / 10, offset.Y)
+				Main.UIGradient.Offset = offset
+			end
+			task.wait(0.05)
+		end
 	end
-
+	
 	task.wait(0.5)
-
+	
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
-
+	
 	task.spawn(function()
-    	while true do
-        	if Main and Main.UIGradient then
-            	Main.UIGradient.Rotation += 0.2
-        	end
-        	task.wait()
-    	end
+		while true do
+			if Main and Main.UIGradient then
+				Main.UIGradient.Rotation += 0.2
+			end
+			task.wait()
+		end
 	end)
-
+	
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	TweenService:Create(LoadingFrame.Title, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
