@@ -705,6 +705,8 @@ local function Minimise()
 end
 
 function RayfieldLibrary:CreateWindow(Settings)
+	Main.UIGradient.Rotation = 0
+	Main.UIGradient.Offset = Vector2.new(-1, Main.UIGradient.Offset.Y)
 	local Passthrough = false
 	Topbar.Title.Text = Settings.Name
 	Main.Size = UDim2.new(0, 450, 0, 260)
@@ -2457,22 +2459,26 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 	Elements.Visible = true
 
+	task.wait(0.4)
+
 	for _ = 1, 3 do
-		for i = 1, 10 do
-			if Main and Main.UIGradient then
-				local offset = Main.UIGradient.Offset
-				offset = Vector2.new(offset.X + 0.1 / 10, offset.Y)
-				Main.UIGradient.Offset = offset
-			end
-			task.wait(0.05)
-		end
+    	for i = 1, 20 do
+        	if Main and Main.UIGradient then
+            	local offset = Main.UIGradient.Offset
+            	offset = Vector2.new(offset.X + 1 / 10, offset.Y)
+            	if offset.X > 1 then
+                	offset = Vector2.new(-1, offset.Y)
+            	end
+            	Main.UIGradient.Offset = offset
+        	end
+        	task.wait(0.01)
+    	end
 	end
-	
-	task.wait(0.5)
 	
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	
 	task.spawn(function()
+		TweenService:Create(Main.UIGradient, TweenInfo.new(1, Enum.EasingStyle.Exponential), {Offset = Vector2.new(0, 1)}):Play()
 		while true do
 			if Main and Main.UIGradient then
 				Main.UIGradient.Rotation += 0.2
@@ -2483,6 +2489,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 	
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 
+	task.wait(0.5)
+	
 	TweenService:Create(LoadingFrame.Title, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 	TweenService:Create(LoadingFrame.Subtitle, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 	TweenService:Create(LoadingFrame.Version, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
