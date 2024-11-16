@@ -206,18 +206,6 @@ if Main == nil then
 end
 local Topbar = Main.Topbar
 
---------------------------------------------------------------------------------------------------------------------------------------------------------
-
-task.spawn(function()
-	while task.wait() do
-		if Main.UIGradient then
-			Main.UIGradient.Rotation += 0.2
-		end
-	end
-end)
-
---------------------------------------------------------------------------------------------------------------------------------------------------------
-
 local MPrompt = Rayfield:FindFirstChild('Prompt')
 local Elements = Main.Elements
 local LoadingFrame = Main.LoadingFrame
@@ -2469,7 +2457,29 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 	Elements.Visible = true
 
+	for _ = 1, 3 do
+        for i = 1, 10 do
+            local offset = Main.UIGradient.Offset
+            offset = UDim2.new(offset.X.Scale + 0.1 / 10, 0, offset.Y.Scale, 0)
+            Main.UIGradient.Offset = offset
+            wait(0.05)
+        end
+    end
+
+
 	task.wait(0.5)
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	task.spawn(function()
+		while task.wait() do
+			if Main.UIGradient then
+				Main.UIGradient.Rotation += 0.2
+			end
+		end
+	end)
+
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+
 	TweenService:Create(LoadingFrame.Title, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 	TweenService:Create(LoadingFrame.Subtitle, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 	TweenService:Create(LoadingFrame.Version, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
