@@ -209,9 +209,9 @@ local Topbar = Main.Topbar
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
 task.spawn(function()
-	while task.wait(0.1) do
+	while task.wait() do
 		if Main.UIGradient then
-			Main.UIGradient.Rotation += 1
+			Main.UIGradient.Rotation += 0.2
 		end
 	end
 end)
