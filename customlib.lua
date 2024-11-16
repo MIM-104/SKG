@@ -269,6 +269,16 @@ task.spawn(function()
 end)
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
+task.spawn(function()
+	while task.wait(0.1) do
+		if Main.UIGradient then
+			Main.UIGradient.Rotation += 1
+		end
+	end
+end)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
 local MPrompt = Rayfield:FindFirstChild('Prompt')
 local Elements = Main.Elements
 local LoadingFrame = Main.LoadingFrame
