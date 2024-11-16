@@ -65,7 +65,7 @@ local RayfieldLibrary = {
 			TextColor = Color3.fromRGB(200, 200, 255), -- Light text for readability on dark background
 
 			Background = Color3.fromRGB(61, 52, 144), -- Deep background to match the dark blue-purple tone
-			Topbar = Color3.fromRGB(45, 40, 100), -- Slightly lighter for the top bar
+			Topbar = Color3.fromRGB(58, 55, 154), -- Slightly lighter for the top bar
 			Shadow = Color3.fromRGB(25, 20, 70), -- Subtle shadow for depth
 
 			NotificationBackground = Color3.fromRGB(53, 45, 126), -- Primary color for notifications
