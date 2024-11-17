@@ -705,8 +705,12 @@ local function Minimise()
 end
 
 function RayfieldLibrary:CreateWindow(Settings)
-	Main.UIGradient.Rotation = 0
-	Main.UIGradient.Offset = Vector2.new(-1, Main.UIGradient.Offset.Y)
+	if Main:FindFirstChild("UIGradient") ~= nil then
+		Main.UIGradient.Rotation = 0
+		Main.UIGradient.Offset = Vector2.new(-1, Main.UIGradient.Offset.Y)
+	else
+		warn("CRITICAL ERROR")
+	end
 	local Passthrough = false
 	Topbar.Title.Text = Settings.Name
 	Main.Size = UDim2.new(0, 450, 0, 260)
