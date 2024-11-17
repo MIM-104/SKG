@@ -435,7 +435,7 @@ local function Hide(notify: boolean?)
 	Debounce = true
 	if notify then
 		if useMobileSizing then
-			RayfieldLibrary:Notify({Title = "Interface Hidden", Content = "The interface has been hidden, you can unhide the interface by tapping 'Show UI'.", Duration = 7, Image = "6023426928"})
+			RayfieldLibrary:Notify({Title = "Interface Hidden", Content = "The interface has been hidden, you can unhide the interface by tapping 'EH'.", Duration = 7, Image = "6023426928"})
 		else
 			RayfieldLibrary:Notify({Title = "Interface Hidden", Content = "The interface has been hidden, you can unhide the interface by tapping K.", Duration = 7, Image = "6023426928"})
 		end
