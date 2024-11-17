@@ -2478,10 +2478,10 @@ function RayfieldLibrary:CreateWindow(Settings)
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	
 	task.spawn(function()
-		TweenService:Create(Main.UIGradient, TweenInfo.new(1, Enum.EasingStyle.Exponential), {Offset = Vector2.new(0, 1)}):Play()
+		TweenService:Create(Main.UIGradient, TweenInfo.new(1, Enum.EasingStyle.Exponential), {Offset = Vector2.new(0, Main.UIGradient.Offset.Y)}):Play()
 		while true do
 			if Main and Main.UIGradient then
-				Main.UIGradient.Rotation += 0.2
+				Main.UIGradient.Rotation += 0.4
 			end
 			task.wait()
 		end
