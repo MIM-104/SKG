@@ -9,7 +9,15 @@ speakingheademoji | Fixing + Custom Theme
 
 ]]
 
+repeat wait() until game.IsLoaded
 
+if game:GetService("CoreGui"):FindFirstChild("Rayfield") ~= nil then
+	game:GetService("CoreGui"):FindFirstChild("Rayfield"):Destroy()
+end
+
+if game:GetService("CoreGui"):FindFirstChild("MESSAGINGSYSTEM") ~= nil then
+	game:GetService("CoreGui"):FindFirstChild("MESSAGINGSYSTEM"):Destroy()
+end
 
 local Release = "Custom Build"
 local RayfieldFolder = "EXPENSIVECOREFOLDER"
@@ -121,6 +129,7 @@ local Rayfield = game:GetObjects("rbxassetid://134415566685128")[1]
 
 local Notifications = Rayfield.Notifications:Clone()
 local a = Instance.new("ScreenGui", game:GetService("CoreGui"))
+a.Name = "MESSAGINGSYSTEM"
 a.ResetOnSpawn = false
 Notifications.Parent = a
 
