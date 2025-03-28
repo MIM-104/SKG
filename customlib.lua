@@ -9,7 +9,7 @@ speakingheademoji | Fixing + Custom Theme
 
 ]]
 
-repeat wait() until game.IsLoaded
+repeat task.wait() until game.IsLoaded
 
 if game:GetService("CoreGui"):FindFirstChild("Rayfield") ~= nil then
 	game:GetService("CoreGui"):FindFirstChild("Rayfield"):Destroy()
@@ -18,9 +18,8 @@ end
 if game:GetService("CoreGui"):FindFirstChild("MESSAGINGSYSTEM") ~= nil then
 	game:GetService("CoreGui"):FindFirstChild("MESSAGINGSYSTEM"):Destroy()
 end
-
 local Release = "Custom Build"
-local RayfieldFolder = "EXPENSIVECOREFOLDER"
+local RayfieldFolder = "EXPENSIVEUI"
 local ConfigurationFolder = RayfieldFolder.."/Configurations"
 local ConfigurationExtension = ".txt"
 
@@ -127,16 +126,19 @@ local Rayfield = game:GetObjects("rbxassetid://134415566685128")[1]
 
 ---------------------------------------------------------------------------------------------------------------------------------------- IMPORTANT
 
-local Notifications = Rayfield.Notifications:Clone()
-local a = Instance.new("ScreenGui", game:GetService("CoreGui"))
-a.Name = "MESSAGINGSYSTEM"
-a.ResetOnSpawn = false
-Notifications.Parent = a
+local Notifications = Rayfield:FindFirstChild("Notifications")
+if Notifications then
+    local a = Instance.new("ScreenGui")
+    a.Name = "MESSAGINGSYSTEM"
+    a.ResetOnSpawn = false
+    a.Parent = CoreGui
+    Notifications:Clone().Parent = a
+end
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 
-Rayfield.Enabled = false
 Rayfield.Parent = CoreGui
+Rayfield.Enabled = false
 
 -- Variables
 
@@ -160,21 +162,21 @@ local function UnpackColor(Color)
 end
 
 local function SaveConfiguration()
-	if not CEnabled then return end
+    if not CEnabled then return end
 
-	local Data = {}
-	for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
-		if Flag.Type == "ColorPicker" then
-			Data[FlagName] = PackColor(Flag.Color)
-		elseif Flag.Type == "Dropdown" then
-			Data[FlagName] = Flag.CurrentOption
-		else
-			Data[FlagName] = Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color
-		end
-	end
+    local Data = {}
+    for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
+        if Flag.Type == "ColorPicker" then
+            Data[FlagName] = PackColor(Flag.Color)
+        elseif Flag.Type == "Dropdown" then
+            Data[FlagName] = Flag.CurrentOption
+        else
+            Data[FlagName] = Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color
+        end
+    end
 
-	local configFile = ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension
-	writefile(configFile, HttpService:JSONEncode(Data))
+    local configFile = ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension
+    writefile(configFile, HttpService:JSONEncode(Data))
 end
 
 if gethui then
@@ -201,10 +203,11 @@ local minSize = Vector2.new(1024, 768)
 local useMobileSizing
 
 if Rayfield.AbsoluteSize.X < minSize.X and Rayfield.AbsoluteSize.Y < minSize.Y then
-	useMobileSizing = true
+    useMobileSizing = true
 end
 
-
+local dragOffset = 255
+local dragOffsetMobile = 150
 
 -- Object Variables
 
@@ -218,6 +221,7 @@ local Topbar = Main.Topbar
 local Elements = Main.Elements
 local LoadingFrame = Main.LoadingFrame
 local TabList = Main.TabList
+local dragBar = Rayfield.Main:FindFirstChild('Drag')
 
 Rayfield.DisplayOrder = 100
 LoadingFrame.Version.Text = Release
@@ -249,7 +253,7 @@ local function ChangeTheme(ThemeName)
 
 	for _, TabPage in ipairs(Elements:GetChildren()) do
 		for _, Element in ipairs(TabPage:GetChildren()) do
-			if Element.ClassName == "Frame" and Element.Name ~= "Placeholder" and Element.Name ~= "SectionSpacing" and Element.Name ~= "SectionTitle" and Element.Name ~= "SearchTitle-fsefsefesfsefesfesfThanks" then
+			if Element.ClassName == "Frame" and (Element:FindFirstChild("Percentage") == nil) and Element.Name ~= "Placeholder" and Element.Name ~= "SectionSpacing" and Element.Name ~= "SectionTitle" and Element.Name ~= "SearchTitle-fsefsefesfsefesfesfThanks" then
 				Element.BackgroundColor3 = SelectedTheme.ElementBackground
 				Element.UIStroke.Color = SelectedTheme.ElementStroke
 			end
@@ -273,6 +277,10 @@ local function LoadConfiguration(Configuration)
 					end
 				elseif Flag.Type == "Dropdown" then
 					if Flag.CurrentOption ~= FlagValue then
+						Flag:Set(FlagValue)
+					end
+				elseif Flag.Type == "Input" then
+					if Flag.CurrentValue ~= FlagValue then
 						Flag:Set(FlagValue)
 					end
 				else
@@ -299,7 +307,8 @@ function RayfieldLibrary:Notify(data) -- action e.g open messages
 	task.spawn(function()
 
 		-- Notification Object Creation
-		local newNotification = Notifications.Template:Clone()
+		print(Notifications)
+		local newNotification = Notifications:WaitForChild("Template"):Clone()
 		newNotification.Name = data.Title or 'No Title Provided'
 		newNotification.Parent = Notifications
 		newNotification.LayoutOrder = #Notifications:GetChildren()
@@ -356,7 +365,7 @@ function RayfieldLibrary:Notify(data) -- action e.g open messages
 		local waitDuration = math.min(math.max((#newNotification.Description.Text * 0.1) + 2.5, 3), 10)
 		task.wait(data.Duration or waitDuration)
 
-		newNotification.Icon.Visible = false
+		newNotification:FindFirstChild("Icon").Visible = false
 		TweenService:Create(newNotification, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
 		TweenService:Create(newNotification.UIStroke, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 		TweenService:Create(newNotification.Shadow, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
@@ -565,7 +574,6 @@ local function Maximise()
 	Debounce = false
 end
 
-
 local function Unhide()
 	Debounce = true
 	Main.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -589,6 +597,8 @@ local function Unhide()
 			TweenService:Create(TopbarButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.8}):Play()
 		end
 	end
+
+	dragBar.Position = useMobileSizing and UDim2.new(0.5, 0, 0.5, dragOffsetMobile) or UDim2.new(0.5, 0, 0.5, dragOffset)
 
 	for _, tabbtn in ipairs(TabList:GetChildren()) do
 		if tabbtn.ClassName == "Frame" and tabbtn.Name ~= "Placeholder" then
@@ -735,34 +745,39 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end
 		end)
 	end
+	
+	--[[
+	local Release = "Custom Build"
+	local RayfieldFolder = "EXPENSIVEUI"
+	local ConfigurationFolder = RayfieldFolder.."/Configurations"
+	local ConfigurationExtension = ".txt"
+	]]
 
 	pcall(function()
 		if not Settings.ConfigurationSaving.FileName then
 			Settings.ConfigurationSaving.FileName = tostring(game.PlaceId)
 		end
-		if not isfolder(RayfieldFolder.."/".."Configuration Folders") then
-			makefolder(RayfieldFolder.."/Configuration Folders")
-		end
+
 		if Settings.ConfigurationSaving.Enabled == nil then
 			Settings.ConfigurationSaving.Enabled = false
 		end
+
 		CFileName = Settings.ConfigurationSaving.FileName
-		ConfigurationFolder = Settings.ConfigurationSaving.FolderName or ConfigurationFolder
+		ConfigurationFolder = RayfieldFolder .. "/Configurations/" .. Settings.ConfigurationSaving.FolderName or ConfigurationFolder
 		CEnabled = Settings.ConfigurationSaving.Enabled
-	
+
 		if Settings.ConfigurationSaving.Enabled then
 			if not isfolder(ConfigurationFolder) then
 				makefolder(ConfigurationFolder)
-			end	
+			end
 		end
 	end)
 
-	local dragBar = Main:FindFirstChild('Drag')
 	dragBar.Visible = false
 	local dragInteract = dragBar and dragBar.Interact or nil
 	local dragBarCosmetic = dragBar and dragBar.Drag or nil
 
-	local function makeDraggable(object, dragObject, enableTaptic)
+	function makeDraggable(object, dragObject, enableTaptic, dragBarCosmetic)
 		local dragging = false
 		local relative = nil
 		local dragTween = nil
@@ -838,7 +853,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 	end
 
 	makeDraggable(Main, Topbar)
-	if dragBar then makeDraggable(Main, dragInteract, true) end
+	if dragBar then makeDraggable(Main, dragInteract, true, dragBarCosmetic) end
 
 	for _, TabButton in ipairs(TabList:GetChildren()) do
 		if TabButton.ClassName == "Frame" and TabButton.Name ~= "Placeholder" then
@@ -1183,6 +1198,22 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 		local Tab = {}
 
+		--[[
+		local Button = Tab:CreateButton({
+			Name = "Button Example",
+			TitleGlow = true,
+			TitleGlowSettings = {
+				Color = Color3.fromRGB(200, 200, 200),
+				Thickness = 2,
+				Transparency = 0.5,
+				-- and other properties here if needed
+			},
+			Callback = function()
+			-- The function that takes place when the button is pressed
+			end,
+		})
+		]]
+
 		-- Button
 		function Tab:CreateButton(ButtonSettings)
 			local ButtonValue = {}
@@ -1193,13 +1224,24 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Button.Visible = true
 			Button.Parent = TabPage
 
+			if ButtonSettings.TitleGlow and ButtonSettings.TitleGlowSettings then
+				local stroke = Instance.new("UIStroke")
+				stroke.Parent = Button.Title
+
+				for property, value in pairs(ButtonSettings.TitleGlowSettings) do
+					if stroke[property] ~= nil then
+						stroke[property] = value
+					end
+				end
+			end
+
 			Button.BackgroundTransparency = 1
 			Button.UIStroke.Transparency = 1
 			Button.Title.TextTransparency = 1
 
 			TweenService:Create(Button, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 			TweenService:Create(Button.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
-			TweenService:Create(Button.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()	
+			TweenService:Create(Button.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
 
 
 			Button.Interact.MouseButton1Click:Connect(function()
@@ -1268,6 +1310,17 @@ function RayfieldLibrary:CreateWindow(Settings)
 			ColorPicker.HexInput.Position = UDim2.new(0, 17, 0, 90)
 			Main.ImageTransparency = 1
 			Background.BackgroundTransparency = 1
+
+			if ColorPickerSettings.TitleGlow and ColorPickerSettings.TitleGlowSettings then
+				local stroke = Instance.new("UIStroke")
+				stroke.Parent = ColorPicker.Title
+
+				for property, value in pairs(ColorPickerSettings.TitleGlowSettings) do
+					if stroke[property] ~= nil then
+						stroke[property] = value
+					end
+				end
+			end
 
 			for _, rgbinput in ipairs(ColorPicker.RGB:GetChildren()) do
 				if rgbinput:IsA("Frame") then
@@ -1519,17 +1572,42 @@ function RayfieldLibrary:CreateWindow(Settings)
 			return SectionValue
 		end
 
+		--[[
+			local Label = Tab:CreateLabel({
+				Text = "ddd",
+				TitleGlow = true,
+				TitleGlowSettings = {
+					Color = Color3.fromRGB(200, 200, 200),
+					Thickness = 2,
+					Transparency = 0.5,
+					-- and other properties here if needed
+				},
+			})
+		]]
+
 		-- Label
-		function Tab:CreateLabel(LabelText)
+		function Tab:CreateLabel(LabelSettings)
 			local LabelValue = {}
 
 			local Label = Elements.Template.Label:Clone()
-			Label.Title.Text = LabelText
+			Label.Title.Text = LabelSettings.Text
 			Label.Visible = true
 			Label.Parent = TabPage
+			
 
 			Label.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
 			Label.UIStroke.Color = SelectedTheme.SecondaryElementStroke
+
+			if LabelSettings.TitleGlow and LabelSettings.TitleGlowSettings then
+				local stroke = Instance.new("UIStroke")
+				stroke.Parent = Label.Title
+
+				for property, value in pairs(LabelSettings.TitleGlowSettings) do
+					if stroke[property] ~= nil then
+						stroke[property] = value
+					end
+				end
+			end
 
 			Label.BackgroundTransparency = 1
 			Label.UIStroke.Transparency = 1
@@ -1551,6 +1629,20 @@ function RayfieldLibrary:CreateWindow(Settings)
 			return LabelValue
 		end
 
+		--[[
+		local Paragraph = Tab:CreateParagraph({
+			Title = "Paragraph Example",
+			Content = "Paragraph Example",
+			TitleGlow = true,
+			TitleGlowSettings = {
+				Color = Color3.fromRGB(200, 200, 200),
+				Thickness = 2,
+				Transparency = 0.5,
+				-- and other properties here if needed
+			},
+		})
+		]]
+
 		-- Paragraph
 		function Tab:CreateParagraph(ParagraphSettings)
 			local ParagraphValue = {}
@@ -1560,6 +1652,17 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Paragraph.Content.Text = ParagraphSettings.Content
 			Paragraph.Visible = true
 			Paragraph.Parent = TabPage
+
+			if ParagraphSettings.TitleGlow and ParagraphSettings.TitleGlowSettings then
+				local stroke = Instance.new("UIStroke")
+				stroke.Parent = Paragraph.Title
+
+				for property, value in pairs(ParagraphSettings.TitleGlowSettings) do
+					if stroke[property] ~= nil then
+						stroke[property] = value
+					end
+				end
+			end
 
 			Paragraph.BackgroundTransparency = 1
 			Paragraph.UIStroke.Transparency = 1
@@ -1573,19 +1676,34 @@ function RayfieldLibrary:CreateWindow(Settings)
 			TweenService:Create(Paragraph.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
 			TweenService:Create(Paragraph.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()	
 			TweenService:Create(Paragraph.Content, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()	
-
-			function ParagraphValue:Set(NewParagraphSettings)
-				Paragraph.Title.Text = NewParagraphSettings.Title
-				Paragraph.Content.Text = NewParagraphSettings.Content
-			end
 			
 			Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
 				Paragraph.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
 				Paragraph.UIStroke.Color = SelectedTheme.SecondaryElementStroke
 			end)
 
+			function ParagraphValue:Set(NewParagraphSettings)
+				Paragraph.Title.Text = NewParagraphSettings.Title
+				Paragraph.Content.Text = NewParagraphSettings.Content
+			end
+
 			return ParagraphValue
 		end
+
+		--[[
+			local ImageParagraph = Tab:CreateImageParagraph({
+				Title = "g",
+				Content = "gg",
+				Image = "95315301252544",
+				TitleGlow = true,
+				TitleGlowSettings = {
+					Color = Color3.fromRGB(200, 200, 200),
+					Thickness = 2,
+					Transparency = 0.5,
+					-- and other properties here if needed
+				},
+			})
+		]]
 
 		-- Image Paragraph
 		function Tab:CreateImageParagraph(ImageParagraphSettings)
@@ -1597,6 +1715,17 @@ function RayfieldLibrary:CreateWindow(Settings)
 			ImageParagraph.Image.Image = "rbxassetid://" .. tostring(ImageParagraphSettings.Image)
 			ImageParagraph.Visible = true
 			ImageParagraph.Parent = TabPage
+
+			if ImageParagraphSettings.TitleGlow and ImageParagraphSettings.TitleGlowSettings then
+				local stroke = Instance.new("UIStroke")
+				stroke.Parent = ImageParagraph.Title
+
+				for property, value in pairs(ImageParagraphSettings.TitleGlowSettings) do
+					if stroke[property] ~= nil then
+						stroke[property] = value
+					end
+				end
+			end
 
 			ImageParagraph.BackgroundTransparency = 1
 			ImageParagraph.UIStroke.Transparency = 1
@@ -1626,7 +1755,136 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 			return ImageParagraphValue
 		end
+
+		local function formatValue(value, currency)
+			if value >= 1e12 then
+				return string.format("%.2fT %s", value / 1e12, currency)
+			elseif value >= 1e9 then
+				return string.format("%.2fB %s", value / 1e9, currency)
+			elseif value >= 1e6 then
+				return string.format("%.2fM %s", value / 1e6, currency)
+			elseif value >= 1e3 then
+				return string.format("%.2fK %s", value / 1e3, currency)
+			else
+				return string.format("%s%.2f", currency, value)
+			end
+		end
+
+		--[[
+			local Stat = Tab:CreateStat({
+            	Title = "Cash",
+            	Icon = "6034973115",
+            	Value = game:GetService("Players").LocalPlayer.Value,
+            	PercentageIncreaseDecrease = true,
+            	Currency = "$",
+				TitleGlow = true,
+				TitleGlowSettings = {
+					Color = Color3.fromRGB(200, 200, 200),
+					Thickness = 2,
+					Transparency = 0.5,
+					-- and other properties here if needed
+				},
+        	})
+		]]
+
+		-- Stat
+		function Tab:CreateStat(StatSettings)
+			local StatValue = {}
 		
+			local Stat = Elements.Template.Stat:Clone()
+			Stat.Icon.Image = "rbxassetid://" .. tostring(StatSettings.Icon)
+			Stat.Title.Text = StatSettings.Title
+			Stat.Amount.Text = formatValue(StatSettings.Value.Value, StatSettings.Currency)
+			
+			if StatSettings.PercentageIncreaseDecrease then
+				Stat.Percentage.Text = "+0%"
+			else
+				Stat.Percentage.Text = ""
+			end
+			Stat.Visible = true
+			Stat.Parent = TabPage
+
+			if StatSettings.TitleGlow and StatSettings.TitleGlowSettings then
+				local stroke = Instance.new("UIStroke")
+				stroke.Parent = Stat.Title
+
+				for property, value in pairs(StatSettings.TitleGlowSettings) do
+					if stroke[property] ~= nil then
+						stroke[property] = value
+					end
+				end
+			end
+		
+			Stat.BackgroundTransparency = 1
+			Stat.UIStroke.Transparency = 1
+			Stat.Title.TextTransparency = 1
+			Stat.Amount.TextTransparency = 1
+			Stat.Percentage.TextTransparency = 1
+			Stat.Icon.ImageTransparency = 1
+		
+			TweenService:Create(Stat, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+			TweenService:Create(Stat.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+			TweenService:Create(Stat.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+			TweenService:Create(Stat.Amount, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+			TweenService:Create(Stat.Icon, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
+			if StatSettings.PercentageIncreaseDecrease then
+				TweenService:Create(Stat.Percentage, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+			end
+		
+			StatSettings.Value:GetPropertyChangedSignal("Value"):Connect(function()
+				Stat.Amount.Text = formatValue(StatSettings.Value.Value, StatSettings.Currency)
+			end)
+			
+			local initialValue = StatSettings.Value.Value
+		
+			function StatValue:Set(NewStatSettings)
+				Stat.Title.Text = NewStatSettings.Title
+				Stat.Amount.Text = NewStatSettings.Content
+				Stat.Icon.Image = NewStatSettings.Image
+			end
+		
+			if StatSettings.PercentageIncreaseDecrease then
+				StatSettings.Value:GetPropertyChangedSignal("Value"):Connect(function()
+					local currentValue = StatSettings.Value.Value
+					local percentageChange = 0
+					if initialValue ~= 0 then
+						percentageChange = math.round(((currentValue - initialValue) / initialValue) * 100)
+					end
+					
+					if percentageChange > 0 then
+						Stat.Percentage.Text = "+" .. tostring(percentageChange) .. "%"
+					elseif percentageChange < 0 then
+						Stat.Percentage.Text = tostring(percentageChange) .. "%"
+					else
+						Stat.Percentage.Text = "+0%"
+					end
+				end)     
+			end
+		
+			return StatValue
+		end
+
+		--[[
+			local Input = Tab:CreateInput({
+   				Name = "Input Example",
+   				CurrentValue = "",
+   				PlaceholderText = "Input Placeholder",
+   				RemoveTextAfterFocusLost = false,
+   				Flag = "Input1",
+   				Callback = function(Text)
+   				-- The function that takes place when the input is changed
+   				-- The variable (Text) is a string for the value in the text box
+   				end,
+				TitleGlow = true,
+				TitleGlowSettings = {
+					Color = Color3.fromRGB(200, 200, 200),
+					Thickness = 2,
+					Transparency = 0.5,
+					-- and other properties here if needed
+				},
+			})
+		]]
+	
 		-- Input
 		function Tab:CreateInput(InputSettings)
 			local Input = Elements.Template.Input:Clone()
@@ -1635,18 +1893,29 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Input.Visible = true
 			Input.Parent = TabPage
 
+			if InputSettings.TitleGlow and InputSettings.TitleGlowSettings then
+				local stroke = Instance.new("UIStroke")
+				stroke.Parent = Input.Title
+
+				for property, value in pairs(InputSettings.TitleGlowSettings) do
+					if stroke[property] ~= nil then
+						stroke[property] = value
+					end
+				end
+			end
+
 			Input.BackgroundTransparency = 1
 			Input.UIStroke.Transparency = 1
 			Input.Title.TextTransparency = 1
 			
-			Input.InputFrame.InputBox.Text = InputSettings.CurrentValue or ''
+			Input.InputFrame.InputBox.Text = InputSettings.CurrentValue
 
 			Input.InputFrame.BackgroundColor3 = SelectedTheme.InputBackground
 			Input.InputFrame.UIStroke.Color = SelectedTheme.InputStroke
 
 			TweenService:Create(Input, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 			TweenService:Create(Input.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
-			TweenService:Create(Input.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()	
+			TweenService:Create(Input.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
 
 			Input.InputFrame.InputBox.PlaceholderText = InputSettings.PlaceholderText
 			Input.InputFrame.Size = UDim2.new(0, Input.InputFrame.InputBox.TextBounds.X + 24, 0, 30)
@@ -1671,7 +1940,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 				if InputSettings.RemoveTextAfterFocusLost then
 					Input.InputFrame.InputBox.Text = ""
 				end
-				
+
 				SaveConfiguration()
 			end)
 
@@ -1706,6 +1975,27 @@ function RayfieldLibrary:CreateWindow(Settings)
 			return InputSettings
 		end
 
+		--[[
+			local Dropdown = Tab:CreateDropdown({
+   				Name = "Dropdown Example",
+   				Options = {"Option 1","Option 2"},
+   				CurrentOption = {"Option 1"},
+   				MultipleOptions = false,
+   				Flag = "Dropdown1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   				Callback = function(Options)
+   				-- The function that takes place when the selected option is changed
+   				-- The variable (Options) is a table of strings for the current selected options
+   				end,
+				TitleGlow = true,
+				TitleGlowSettings = {
+					Color = Color3.fromRGB(200, 200, 200),
+					Thickness = 2,
+					Transparency = 0.5,
+					-- and other properties here if needed
+				},
+			})
+		]]
+
 		-- Dropdown
 		function Tab:CreateDropdown(DropdownSettings)
 			local Dropdown = Elements.Template.Dropdown:Clone()
@@ -1717,6 +2007,17 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Dropdown.Title.Text = DropdownSettings.Name
 			Dropdown.Visible = true
 			Dropdown.Parent = TabPage
+
+			if DropdownSettings.TitleGlow and DropdownSettings.TitleGlowSettings then
+				local stroke = Instance.new("UIStroke")
+				stroke.Parent = Dropdown.Title
+
+				for property, value in pairs(DropdownSettings.TitleGlowSettings) do
+					if stroke[property] ~= nil then
+						stroke[property] = value
+					end
+				end
+			end
 		
 			Dropdown.List.Visible = false
 			if DropdownSettings.CurrentOption then
@@ -2012,6 +2313,26 @@ function RayfieldLibrary:CreateWindow(Settings)
 			return DropdownSettings
 		end
 
+		--[[
+			local Keybind = Tab:CreateKeybind({
+   				Name = "Keybind Example",
+   				CurrentKeybind = "Q",
+   				HoldToInteract = false,
+   				Flag = "Keybind1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   				Callback = function(Keybind)
+   				-- The function that takes place when the keybind is pressed
+   				-- The variable (Keybind) is a boolean for whether the keybind is being held or not (HoldToInteract needs to be true)
+   				end,
+				TitleGlow = true,
+				TitleGlowSettings = {
+					Color = Color3.fromRGB(200, 200, 200),
+					Thickness = 2,
+					Transparency = 0.5,
+					-- and other properties here if needed
+				},
+			})
+		]]
+
 		-- Keybind
 		function Tab:CreateKeybind(KeybindSettings)
 			local CheckingForKey = false
@@ -2020,6 +2341,17 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Keybind.Title.Text = KeybindSettings.Name
 			Keybind.Visible = true
 			Keybind.Parent = TabPage
+
+			if KeybindSettings.TitleGlow and KeybindSettings.TitleGlowSettings then
+				local stroke = Instance.new("UIStroke")
+				stroke.Parent = Keybind.Title
+
+				for property, value in pairs(KeybindSettings.TitleGlowSettings) do
+					if stroke[property] ~= nil then
+						stroke[property] = value
+					end
+				end
+			end
 
 			Keybind.BackgroundTransparency = 1
 			Keybind.UIStroke.Transparency = 1
@@ -2128,6 +2460,25 @@ function RayfieldLibrary:CreateWindow(Settings)
 			return KeybindSettings
 		end
 
+		--[[
+			local Toggle = Tab:CreateToggle({
+   				Name = "Toggle Example",
+   				CurrentValue = false,
+   				Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   				Callback = function(Value)
+   				-- The function that takes place when the toggle is pressed
+   				-- The variable (Value) is a boolean on whether the toggle is true or false
+   				end,
+				TitleGlow = true,
+				TitleGlowSettings = {
+					Color = Color3.fromRGB(200, 200, 200),
+					Thickness = 2,
+					Transparency = 0.5,
+					-- and other properties here if needed
+				},
+			})
+		]]
+
 		-- Toggle
 		function Tab:CreateToggle(ToggleSettings)
 			local ToggleValue = {}
@@ -2138,6 +2489,17 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Toggle.Visible = true
 			Toggle.Parent = TabPage
 
+			if ToggleSettings.TitleGlow and ToggleSettings.TitleGlowSettings then
+				local stroke = Instance.new("UIStroke")
+				stroke.Parent = Toggle.Title
+
+				for property, value in pairs(ToggleSettings.TitleGlowSettings) do
+					if stroke[property] ~= nil then
+						stroke[property] = value
+					end
+				end
+			end
+
 			Toggle.BackgroundTransparency = 1
 			Toggle.UIStroke.Transparency = 1
 			Toggle.Title.TextTransparency = 1
@@ -2146,7 +2508,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 			TweenService:Create(Toggle, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 			TweenService:Create(Toggle.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
-			TweenService:Create(Toggle.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()	
+			TweenService:Create(Toggle.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
 
 			if not ToggleSettings.CurrentValue then
 				Toggle.Switch.Indicator.Position = UDim2.new(1, -40, 0.5, 0)
@@ -2278,6 +2640,455 @@ function RayfieldLibrary:CreateWindow(Settings)
 			return ToggleSettings
 		end
 
+		-- ExternalParagraph
+		function Tab:CreateExternalParagraph(ExternalParagraphSettings)
+			local ExternalParagraphValue = {}
+			local createdElements = {}  -- Table to store all created (cloned) elements
+			ExternalParagraphSettings.CreatedElements = {}  -- Mapping table for dynamic element references
+		
+			-- Create the main external paragraph element
+			local ExternalParagraph = Elements.Template.ExternalParagraph:Clone()
+			ExternalParagraph.Name = ExternalParagraphSettings.Title .. "rr"
+			ExternalParagraph.Title.Text = ExternalParagraphSettings.Title
+			ExternalParagraph.Visible = true
+			ExternalParagraph.Parent = TabPage
+		
+			if ExternalParagraphSettings.TitleGlow and ExternalParagraphSettings.TitleGlowSettings then
+				local stroke = Instance.new("UIStroke")
+				stroke.Parent = ExternalParagraph.Title
+				for property, value in pairs(ExternalParagraphSettings.TitleGlowSettings) do
+					if stroke[property] ~= nil then
+						stroke[property] = value
+					end
+				end
+			end
+		
+			ExternalParagraph.BackgroundTransparency = 1
+			ExternalParagraph.SwitchHolder.BackgroundTransparency = 1
+			ExternalParagraph.UIStroke.Transparency = 1
+			ExternalParagraph.SwitchHolder.UIStroke.Transparency = 1
+			ExternalParagraph.Title.TextTransparency = 1
+			ExternalParagraph.SwitchHolder.Switch.BackgroundColor3 = SelectedTheme.ToggleBackground
+		
+			TweenService:Create(ExternalParagraph, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+			TweenService:Create(ExternalParagraph.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+			TweenService:Create(ExternalParagraph.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+			TweenService:Create(ExternalParagraph.SwitchHolder, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+			TweenService:Create(ExternalParagraph.SwitchHolder.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+		
+			if not ExternalParagraphSettings.CurrentValue then
+				ExternalParagraph.SwitchHolder.Switch.Indicator.Position = UDim2.new(1, -40, 0.5, 0)
+				ExternalParagraph.SwitchHolder.Switch.Indicator.UIStroke.Color = SelectedTheme.ToggleDisabledStroke
+				ExternalParagraph.SwitchHolder.Switch.Indicator.BackgroundColor3 = SelectedTheme.ToggleDisabled
+				ExternalParagraph.SwitchHolder.Switch.UIStroke.Color = SelectedTheme.ToggleDisabledOuterStroke
+			else
+				ExternalParagraph.SwitchHolder.Switch.Indicator.Position = UDim2.new(1, -20, 0.5, 0)
+				ExternalParagraph.SwitchHolder.Switch.Indicator.UIStroke.Color = SelectedTheme.ToggleEnabledStroke
+				ExternalParagraph.SwitchHolder.Switch.Indicator.BackgroundColor3 = SelectedTheme.ToggleEnabled
+				ExternalParagraph.SwitchHolder.Switch.UIStroke.Color = SelectedTheme.ToggleEnabledOuterStroke
+			end
+		
+			ExternalParagraph.MouseEnter:Connect(function()
+				TweenService:Create(ExternalParagraph, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
+			end)
+			ExternalParagraph.MouseLeave:Connect(function()
+				TweenService:Create(ExternalParagraph, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
+			end)
+		
+			ExternalParagraph.SwitchHolder.MouseEnter:Connect(function()
+				TweenService:Create(ExternalParagraph.SwitchHolder, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
+			end)
+			ExternalParagraph.SwitchHolder.MouseLeave:Connect(function()
+				TweenService:Create(ExternalParagraph.SwitchHolder, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
+			end)
+		
+			-- Create the external container (EP) for extra elements.
+			local EP = Rayfield.ExternalParagraphTemplate:Clone()
+			EP.Parent = Rayfield
+			EP.Name = ExternalParagraphSettings.ParagraphTitle .. "External"
+			EP.Topbar.Title.Text = ExternalParagraphSettings.ParagraphTitle
+		
+			-- Helper function to create a Label element
+			local function CreateLabel(LabelSettings)
+				local Label = EP.Elements.Template.Label:Clone()
+				Label.Title.Text = LabelSettings.Text
+				Label.Visible = true
+				Label.Parent = EP.Elements.Template  -- Keep the template parent
+		
+				Label.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
+				Label.UIStroke.Color = SelectedTheme.SecondaryElementStroke
+		
+				if LabelSettings.TitleGlow and LabelSettings.TitleGlowSettings then
+					local stroke = Instance.new("UIStroke")
+					stroke.Parent = Label.Title
+					for property, value in pairs(LabelSettings.TitleGlowSettings) do
+						if stroke[property] ~= nil then
+							stroke[property] = value
+						end
+					end
+				end
+		
+				Label.BackgroundTransparency = 1
+				Label.UIStroke.Transparency = 1
+				Label.Title.TextTransparency = 1
+		
+				TweenService:Create(Label, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+				TweenService:Create(Label.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+				TweenService:Create(Label.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+		
+				table.insert(createdElements, Label)
+				return Label
+			end
+		
+			-- Helper function to create a Paragraph element
+			local function CreateParagraph(ParagraphSettings)
+				local Paragraph = EP.Elements.Template.Paragraph:Clone()
+				Paragraph.Title.Text = ParagraphSettings.Title or "Paragraph"
+				Paragraph.Content.Text = ParagraphSettings.Content or ""
+				Paragraph.Visible = true
+				Paragraph.Parent = EP.Elements.Template  -- Keep the template parent
+		
+				Paragraph.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
+				Paragraph.UIStroke.Color = SelectedTheme.SecondaryElementStroke
+		
+				Paragraph.BackgroundTransparency = 1
+				Paragraph.UIStroke.Transparency = 1
+				Paragraph.Title.TextTransparency = 1
+				Paragraph.Content.TextTransparency = 1
+		
+				TweenService:Create(Paragraph, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+				TweenService:Create(Paragraph.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+				TweenService:Create(Paragraph.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+				TweenService:Create(Paragraph.Content, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+		
+				table.insert(createdElements, Paragraph)
+				return Paragraph
+			end
+		
+			-- Dynamically create elements from the provided settings
+			for key, elementSettings in pairs(ExternalParagraphSettings.Elements) do
+				if elementSettings.Type == "Label" then
+					local label = CreateLabel(elementSettings)
+					ExternalParagraphSettings.CreatedElements[key] = { Type = "Label", Object = label }
+				elseif elementSettings.Type == "Paragraph" then
+					local paragraph = CreateParagraph(elementSettings)
+					ExternalParagraphSettings.CreatedElements[key] = { Type = "Paragraph", Object = paragraph }
+				else
+					warn("Element type '" .. tostring(elementSettings.Type) .. "' is not supported.")
+				end
+			end
+		
+			-- SwitchHolder interaction
+			ExternalParagraph.SwitchHolder.Interact.MouseButton1Click:Connect(function()
+				if ExternalParagraphSettings.CurrentValue then
+					ExternalParagraphSettings.CurrentValue = false
+					-- OFF branch
+					if EP then
+						local originalSize = EP:GetAttribute("OriginalSize") or EP.Size
+						local lineSize = UDim2.new(originalSize.X.Scale, originalSize.X.Offset, 0, 2)
+						local closeTween = TweenService:Create(EP, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {Size = lineSize, BackgroundTransparency = 1})
+		
+						-- Tween only the created elements
+						for _, v in ipairs(createdElements) do
+							if v:IsA("Frame") then
+								TweenService:Create(v, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
+								if v:FindFirstChild("UIStroke") then
+									TweenService:Create(v.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
+								end
+								if v:FindFirstChild("Title") then
+									TweenService:Create(v.Title, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
+								end
+								if v:FindFirstChild("Content") then
+									TweenService:Create(v.Content, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
+								end
+								if v:FindFirstChild("Image") then
+									TweenService:Create(v.Image, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
+								end
+							end
+						end
+		
+						for _, v in pairs(EP.ResizeFrames:GetChildren()) do
+							if v:IsA("Frame") then
+								TweenService:Create(v, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
+							end
+						end
+						closeTween:Play()
+		
+						TweenService:Create(EP.Topbar, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
+						TweenService:Create(EP.Topbar.CornerRepair, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
+						TweenService:Create(EP.Topbar.Divider, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
+						TweenService:Create(EP.Topbar.Title, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
+						TweenService:Create(EP.Drag.Drag, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
+		
+						closeTween.Completed:Connect(function()
+							EP.Visible = false
+							EP.Size = originalSize
+							EP.BackgroundTransparency = 0
+						end)
+					end
+		
+					TweenService:Create(ExternalParagraph, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
+					TweenService:Create(ExternalParagraph.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
+					TweenService:Create(ExternalParagraph.SwitchHolder.Switch.Indicator, TweenInfo.new(0.45, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Position = UDim2.new(1, -40, 0.5, 0)}):Play()
+					TweenService:Create(ExternalParagraph.SwitchHolder.Switch.Indicator.UIStroke, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Color = SelectedTheme.ToggleDisabledStroke}):Play()
+					TweenService:Create(ExternalParagraph.SwitchHolder.Switch.Indicator, TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {BackgroundColor3 = SelectedTheme.ToggleDisabled}):Play()
+					TweenService:Create(ExternalParagraph.SwitchHolder.Switch.UIStroke, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Color = SelectedTheme.ToggleDisabledOuterStroke}):Play()
+					TweenService:Create(ExternalParagraph, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
+					TweenService:Create(ExternalParagraph.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+				else
+					ExternalParagraphSettings.CurrentValue = true
+					-- ON branch
+					if EP then
+						EP:SetAttribute("OriginalSize", EP.Size)
+		
+						for _, TopbarButton in ipairs(EP.Topbar:GetChildren()) do
+							if TopbarButton.ClassName == "ImageButton" then
+								TopbarButton.MouseEnter:Connect(function()
+									TweenService:Create(TopbarButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
+								end)
+								TopbarButton.MouseLeave:Connect(function()
+									TweenService:Create(TopbarButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.8}):Play()
+								end)
+							end
+						end
+		
+						makeDraggable(EP, EP.Topbar)
+						makeDraggable(EP, EP.Drag.Interact, true, EP.Drag.Drag)
+		
+						coroutine.wrap(function()
+							local handlesContainer = EP.ResizeFrames
+							local resizable = handlesContainer.Parent
+		
+							local draggingBar = false
+							local activeHandle = nil
+							local dragStart
+							local startSize
+							local startPosition
+		
+							local MIN_WIDTH = 500
+							local MIN_HEIGHT = 200
+							local MAX_WIDTH = 800
+							local MAX_HEIGHT = 600
+		
+							local function clampSize(newSize)
+								local newWidth = math.clamp(newSize.X.Offset, MIN_WIDTH, MAX_WIDTH)
+								local newHeight = math.clamp(newSize.Y.Offset, MIN_HEIGHT, MAX_HEIGHT)
+								return UDim2.new(newSize.X.Scale, newWidth, newSize.Y.Scale, newHeight)
+							end
+		
+							local originalProperties = {}
+		
+							local function storeOriginalProperties(guiObject)
+								if guiObject:IsA("GuiObject") then
+									if guiObject:GetAttribute("ResizeWithParent") ~= false then
+										originalProperties[guiObject] = {
+											Size = guiObject.Size,
+											Position = guiObject.Position,
+										}
+										for _, child in ipairs(guiObject:GetChildren()) do
+											storeOriginalProperties(child)
+										end
+									end
+								end
+							end
+		
+							local function updateDescendants(parent, parentOriginalSize)
+								for _, child in ipairs(parent:GetChildren()) do
+									if child:IsA("GuiObject") and originalProperties[child] then
+										local orig = originalProperties[child]
+										local factorX = 1
+										local factorY = 1
+										if parentOriginalSize.X.Offset ~= 0 then
+											factorX = parent.Size.X.Offset / parentOriginalSize.X.Offset
+										end
+										if parentOriginalSize.Y.Offset ~= 0 then
+											factorY = parent.Size.Y.Offset / parentOriginalSize.Y.Offset
+										end
+										child.Size = UDim2.new(
+											orig.Size.X.Scale,
+											orig.Size.X.Offset * factorX,
+											orig.Size.Y.Scale,
+											orig.Size.Y.Offset * factorY
+										)
+										child.Position = UDim2.new(
+											orig.Position.X.Scale,
+											orig.Position.X.Offset * factorX,
+											orig.Position.Y.Scale,
+											orig.Position.Y.Offset * factorY
+										)
+										updateDescendants(child, orig.Size)
+									end
+								end
+							end
+		
+							local function update(input)
+								local delta = input.Position - dragStart
+								local newSize = startSize
+								local newPos = startPosition
+		
+								if activeHandle.Name == "RightEdge" then
+									newSize = UDim2.new(startSize.X.Scale, startSize.X.Offset + delta.X, startSize.Y.Scale, startSize.Y.Offset)
+								elseif activeHandle.Name == "LeftEdge" then
+									newSize = UDim2.new(startSize.X.Scale, startSize.X.Offset - delta.X, startSize.Y.Scale, startSize.Y.Offset)
+									newPos = UDim2.new(startPosition.X.Scale, startPosition.X.Offset + delta.X, startPosition.Y.Scale, startPosition.Y.Offset)
+								elseif activeHandle.Name == "BottomEdge" then
+									newSize = UDim2.new(startSize.X.Scale, startSize.X.Offset, startSize.Y.Scale, startSize.Y.Offset + delta.Y)
+								elseif activeHandle.Name == "TopEdge" then
+									newSize = UDim2.new(startSize.X.Scale, startSize.X.Offset, startSize.Y.Scale, startSize.Y.Offset - delta.Y)
+									newPos = UDim2.new(startPosition.X.Scale, startPosition.X.Offset, startPosition.Y.Scale, startPosition.Y.Offset + delta.Y)
+								elseif activeHandle.Name == "TopLeft" then
+									newSize = UDim2.new(startSize.X.Scale, startSize.X.Offset - delta.X, startSize.Y.Scale, startSize.Y.Offset - delta.Y)
+									newPos = UDim2.new(startPosition.X.Scale, startPosition.X.Offset + delta.X, startPosition.Y.Scale, startPosition.Y.Offset + delta.Y)
+								elseif activeHandle.Name == "TopRight" then
+									newSize = UDim2.new(startSize.X.Scale, startSize.X.Offset + delta.X, startSize.Y.Scale, startSize.Y.Offset - delta.Y)
+									newPos = UDim2.new(startPosition.X.Scale, startPosition.X.Offset, startPosition.Y.Scale, startPosition.Y.Offset + delta.Y)
+								elseif activeHandle.Name == "BottomLeft" then
+									newSize = UDim2.new(startSize.X.Scale, startSize.X.Offset - delta.X, startSize.Y.Scale, startSize.Y.Offset + delta.Y)
+									newPos = UDim2.new(startPosition.X.Scale, startPosition.X.Offset + delta.X, startPosition.Y.Scale, startPosition.Y.Offset)
+								elseif activeHandle.Name == "BottomRight" then
+									newSize = UDim2.new(startSize.X.Scale, startSize.X.Offset + delta.X, startSize.Y.Scale, startSize.Y.Offset + delta.Y)
+								end
+		
+								newSize = clampSize(newSize)
+								resizable.Size = newSize
+								resizable.Position = newPos
+								updateDescendants(resizable, startSize)
+							end
+		
+							for _, handle in pairs(handlesContainer:GetChildren()) do
+								if handle:IsA("GuiObject") then
+									handle.InputBegan:Connect(function(input)
+										if input.UserInputType == Enum.UserInputType.MouseButton1 or 
+										   input.UserInputType == Enum.UserInputType.Touch then
+											draggingBar = true
+											activeHandle = handle
+											dragStart = input.Position
+											startSize = resizable.Size
+											startPosition = resizable.Position
+											originalProperties = {}
+											for _, child in ipairs(resizable:GetChildren()) do
+												storeOriginalProperties(child)
+											end
+											input.Changed:Connect(function()
+												if input.UserInputState == Enum.UserInputState.End then
+													draggingBar = false
+													activeHandle = nil
+													EP:SetAttribute("OriginalSize", resizable.Size)
+													originalProperties = {}
+												end
+											end)
+										end
+									end)
+								end
+							end
+		
+							UserInputService.InputChanged:Connect(function(input)
+								if draggingBar and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+									update(input)
+								end
+							end)
+						end)()
+					end
+		
+					EP.Visible = true
+		
+					local originalSize = EP:GetAttribute("OriginalSize") or EP.Size
+					EP.Size = UDim2.new(originalSize.X.Scale, originalSize.X.Offset, 0, 2)
+					EP.BackgroundTransparency = 1
+					local openTween = TweenService:Create(EP, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {Size = originalSize, BackgroundTransparency = 0})
+					openTween:Play()
+		
+					-- Fade in created elements
+					for _, v in ipairs(createdElements) do
+						if v:IsA("Frame") then
+							TweenService:Create(v, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+							if v:FindFirstChild("UIStroke") then
+								TweenService:Create(v.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+							end
+							if v:FindFirstChild("Title") then
+								TweenService:Create(v.Title, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+							end
+							if v:FindFirstChild("Content") then
+								TweenService:Create(v.Content, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+							end
+							if v:FindFirstChild("Image") then
+								TweenService:Create(v.Image, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
+							end
+						end
+					end
+		
+					for _, v in pairs(EP.ResizeFrames:GetChildren()) do
+						if v:IsA("Frame") then
+							TweenService:Create(v, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.6}):Play()
+						end
+					end
+		
+					TweenService:Create(EP.Topbar, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+					TweenService:Create(EP.Topbar.CornerRepair, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+					TweenService:Create(EP.Topbar.Divider, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+					TweenService:Create(EP.Topbar.Title, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+					TweenService:Create(EP.Drag.Drag, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.7}):Play()
+		
+					TweenService:Create(ExternalParagraph, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
+					TweenService:Create(ExternalParagraph.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
+					TweenService:Create(ExternalParagraph.SwitchHolder.Switch.Indicator, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Position = UDim2.new(1, -20, 0.5, 0)}):Play()
+					TweenService:Create(ExternalParagraph.SwitchHolder.Switch.Indicator.UIStroke, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Color = SelectedTheme.ToggleEnabledStroke}):Play()
+					TweenService:Create(ExternalParagraph.SwitchHolder.Switch.Indicator, TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {BackgroundColor3 = SelectedTheme.ToggleEnabled}):Play()
+					TweenService:Create(ExternalParagraph.SwitchHolder.Switch.UIStroke, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Color = SelectedTheme.ToggleEnabledOuterStroke}):Play()
+					TweenService:Create(ExternalParagraph, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
+					TweenService:Create(ExternalParagraph.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+				end
+		
+				SaveConfiguration()
+			end)
+		
+			if Settings.ConfigurationSaving then
+				if Settings.ConfigurationSaving.Enabled and ExternalParagraphSettings.Flag then
+					RayfieldLibrary.Flags[ExternalParagraphSettings.Flag] = ExternalParagraphSettings
+				end
+			end
+		
+			Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
+				ExternalParagraph.SwitchHolder.Switch.BackgroundColor3 = SelectedTheme.ToggleBackground
+				if not ExternalParagraphSettings.CurrentValue then
+					ExternalParagraph.SwitchHolder.Switch.Indicator.UIStroke.Color = SelectedTheme.ToggleDisabledStroke
+					ExternalParagraph.SwitchHolder.Switch.Indicator.BackgroundColor3 = SelectedTheme.ToggleDisabled
+					ExternalParagraph.SwitchHolder.Switch.UIStroke.Color = SelectedTheme.ToggleDisabledOuterStroke
+				else
+					ExternalParagraph.SwitchHolder.Switch.Indicator.UIStroke.Color = SelectedTheme.ToggleEnabledStroke
+					ExternalParagraph.SwitchHolder.Switch.Indicator.BackgroundColor3 = SelectedTheme.ToggleEnabled
+					ExternalParagraph.SwitchHolder.Switch.UIStroke.Color = SelectedTheme.ToggleEnabledOuterStroke
+				end
+			end)
+		
+			function ExternalParagraphValue:Set(newValues)
+				for key, newData in pairs(newValues) do
+					local elementInfo = ExternalParagraphSettings.CreatedElements[key]
+					if elementInfo then
+						if elementInfo.Type == "Label" then
+							if newData.Text and type(newData.Text) == "string" then
+								elementInfo.Object.Title.Text = newData.Text
+							end
+						elseif elementInfo.Type == "Paragraph" then
+							if newData.Title and type(newData.Title) == "string" then
+								elementInfo.Object.Title.Text = newData.Title
+							end
+							if newData.Content and type(newData.Content) == "string" then
+								elementInfo.Object.Content.Text = newData.Content
+							end
+						else
+							warn("Unsupported element type: " .. tostring(elementInfo.Type))
+						end
+					else
+						warn("No created element found for key: " .. tostring(key))
+					end
+				end
+			end
+		
+			return ExternalParagraphValue
+		end	
+		
+
 		-- Slider
 		function Tab:CreateSlider(SliderSettings)
 			local SLDragging = false
@@ -2286,6 +3097,17 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Slider.Title.Text = SliderSettings.Name
 			Slider.Visible = true
 			Slider.Parent = TabPage
+
+			if SliderSettings.TitleGlow and SliderSettings.TitleGlowSettings then
+				local stroke = Instance.new("UIStroke")
+				stroke.Parent = Slider.Title
+
+				for property, value in pairs(SliderSettings.TitleGlowSettings) do
+					if stroke[property] ~= nil then
+						stroke[property] = value
+					end
+				end
+			end
 
 			Slider.BackgroundTransparency = 1
 			Slider.UIStroke.Transparency = 1
@@ -2467,14 +3289,15 @@ function RayfieldLibrary:CreateWindow(Settings)
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	
 	task.spawn(function()
-		TweenService:Create(Main.UIGradient, TweenInfo.new(1, Enum.EasingStyle.Exponential), {Offset = Vector2.new(0, Main.UIGradient.Offset.Y)}):Play()
-		while true do
-			if Main and Main.UIGradient then
-				Main.UIGradient.Rotation += 0.4
+		if Main:FindFirstChild("UIGradient") then
+			TweenService:Create(Main:FindFirstChild("UIGradient"), TweenInfo.new(1, Enum.EasingStyle.Exponential), {Offset = Vector2.new(0, Main:FindFirstChild("UIGradient").Offset.Y)}):Play()
+			
+			while Main and Main:FindFirstChild("UIGradient") do
+				Main:FindFirstChild("UIGradient").Rotation = Main:FindFirstChild("UIGradient").Rotation + 0.4
+				task.wait()
 			end
-			task.wait()
 		end
-	end)
+	end)	
 	
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -2486,9 +3309,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 	task.wait(0.3)
 	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 500, 0, 247)}):Play()
     task.wait(0.3)
-    TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 500, 0, 475)}):Play()
+    TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = useMobileSizing and UDim2.new(0, 500, 0, 275) or UDim2.new(0, 500, 0, 475)}):Play()
 	TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.6}):Play()
-
 	Topbar.BackgroundTransparency = 1
 	Topbar.Divider.Size = UDim2.new(0, 0, 0, 1)
 	Topbar.Divider.BackgroundColor3 = SelectedTheme.ElementStroke
@@ -2654,6 +3476,14 @@ end
 
 
 function RayfieldLibrary:LoadConfiguration()
+
+	--[[
+	local Release = "Custom Build"
+	local RayfieldFolder = "EXPENSIVEUI"
+	local ConfigurationFolder = RayfieldFolder.."/Configurations"
+	local ConfigurationExtension = ".txt"
+	]]
+
 	if CEnabled then
 		notificationSent = false
 		local configFile = ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension
@@ -2665,6 +3495,7 @@ function RayfieldLibrary:LoadConfiguration()
 				Image = "6023426911"
 			})
 		else
+			print(configFile)
 			local success, result = pcall(function()
 				LoadConfiguration(readfile(configFile))
 				return true
@@ -2682,3 +3513,68 @@ function RayfieldLibrary:LoadConfiguration()
 end
 
 return RayfieldLibrary
+
+--[[
+
+local Rayfield = loadstring(game:HttpGet('https://pastebin.com/raw/svfAgxc6'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Rayfield Example Window",
+   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   LoadingTitle = "Rayfield Interface Suite",
+   LoadingSubtitle = "by Sirius",
+   Theme = "Custom", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
+
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = nil, -- Create a custom folder for your hub/game
+      FileName = "Big Hub"
+   },
+
+   Discord = {
+      Enabled = false, -- Prompt the user to join your Discord server if their executor supports it
+      Invite = "noinvitelink", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ ABCD would be ABCD
+      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
+   },
+
+   KeySystem = false, -- Set this to true to use our key system
+   KeySettings = {
+      Title = "Untitled",
+      Subtitle = "Key System",
+      Note = "No method of obtaining the key is provided", -- Use this to tell the user how to get a key
+      FileName = "Key", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
+      SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
+      GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
+      Key = {"Hello"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
+   }
+})
+
+local Tab = Window:CreateTab("Tab Example", 4483362458) -- Title, Image
+
+local ExternalParagraph = Tab:CreateExternalParagraph({
+    Title = "ExternalParagraphExample",
+	ParagraphTitle = "ExternalParagraphExample 2",
+    CurrentValue = false,
+    Flag = "ExternalParagraph1",
+    TitleGlow = true,
+    TitleGlowSettings = {
+        Color = Color3.fromRGB(200, 200, 200),
+        Thickness = 2,
+        Transparency = 0.5,
+        -- and other properties here if needed
+    },
+    Elements = {
+        label = { Type = "Label", Text = "ddd" },
+        paragraph = { Type = "Paragraph", Title = "Title Example", Content = "Content Example" }
+    }
+})
+
+ExternalParagraph:Set({
+    label = { Text = "dddggghfghf" },
+    paragraph = { Title = "Titlsdfsde Examsdfple", Content = "Contsfdsnt Exasfsdfmple" }
+})
+
+]]
