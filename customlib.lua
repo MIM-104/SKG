@@ -722,9 +722,10 @@ function RayfieldLibrary:CreateWindow(Settings)
 	end
 
 	if Settings.Theme then
-		local success = pcall(ChangeTheme, Settings.Theme)
-		if not success then
-			local success = pcall(ChangeTheme, 'Custom')
+		if RayfieldLibrary.Theme[Settings.Theme] then
+			ChangeTheme(Settings.Theme)
+		else
+			ChangeTheme('Custom')
 		end
 	end
 
@@ -753,25 +754,23 @@ function RayfieldLibrary:CreateWindow(Settings)
 	local ConfigurationExtension = ".txt"
 	]]
 
-	pcall(function()
-		if not Settings.ConfigurationSaving.FileName then
-			Settings.ConfigurationSaving.FileName = tostring(game.PlaceId)
-		end
+	if not Settings.ConfigurationSaving.FileName then
+		Settings.ConfigurationSaving.FileName = tostring(game.PlaceId)
+	end
 
-		if Settings.ConfigurationSaving.Enabled == nil then
-			Settings.ConfigurationSaving.Enabled = false
-		end
+	if Settings.ConfigurationSaving.Enabled == nil then
+		Settings.ConfigurationSaving.Enabled = false
+	end
 
-		CFileName = Settings.ConfigurationSaving.FileName
-		ConfigurationFolder = RayfieldFolder .. "/Configurations/" .. Settings.ConfigurationSaving.FolderName or ConfigurationFolder
-		CEnabled = Settings.ConfigurationSaving.Enabled
+	CFileName = Settings.ConfigurationSaving.FileName
+	ConfigurationFolder = RayfieldFolder .. "/Configurations/" .. Settings.ConfigurationSaving.FolderName or ConfigurationFolder
+	CEnabled = Settings.ConfigurationSaving.Enabled
 
-		if Settings.ConfigurationSaving.Enabled then
-			if not isfolder(ConfigurationFolder) then
-				makefolder(ConfigurationFolder)
-			end
+	if Settings.ConfigurationSaving.Enabled then
+		if not isfolder(ConfigurationFolder) then
+			makefolder(ConfigurationFolder)
 		end
-	end)
+	end
 
 	dragBar.Visible = false
 	local dragInteract = dragBar and dragBar.Interact or nil
@@ -905,14 +904,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 		if Settings.KeySettings.GrabKeyFromSite then
 			for i, Key in ipairs(Settings.KeySettings.Key) do
-				local Success, Response = pcall(function()
-					Settings.KeySettings.Key[i] = tostring(game:HttpGet(Key):gsub("[\n\r]", " "))
-					Settings.KeySettings.Key[i] = string.gsub(Settings.KeySettings.Key[i], " ", "")
-				end)
-				if not Success then
-					print("Rayfield | "..Key.." Error " ..tostring(Response))
-					
-				end
+				Settings.KeySettings.Key[i] = tostring(game:HttpGet(Key):gsub("[\n\r]", " "))
+				Settings.KeySettings.Key[i] = string.gsub(Settings.KeySettings.Key[i], " ", "")
 			end
 		end
 
@@ -1245,28 +1238,15 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 
 			Button.Interact.MouseButton1Click:Connect(function()
-				local Success, Response = pcall(ButtonSettings.Callback)
-				if not Success then
-					TweenService:Create(Button, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
-					TweenService:Create(Button.ElementIndicator, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
-					TweenService:Create(Button.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
-					Button.Title.Text = "Callback Error"
-					print("Rayfield Callback Error: " ..tostring(Response))
-                    task.wait(0.5)
-					Button.Title.Text = ButtonSettings.Name
-					TweenService:Create(Button, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
-					TweenService:Create(Button.ElementIndicator, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 0.9}):Play()
-					TweenService:Create(Button.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
-				else
-					SaveConfiguration()
-					TweenService:Create(Button, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
-					TweenService:Create(Button.ElementIndicator, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
-					TweenService:Create(Button.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
-					task.wait(0.2)
-					TweenService:Create(Button, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
-					TweenService:Create(Button.ElementIndicator, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 0.9}):Play()
-					TweenService:Create(Button.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
-				end
+				ButtonSettings.Callback()
+				SaveConfiguration()
+				TweenService:Create(Button, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
+				TweenService:Create(Button.ElementIndicator, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
+				TweenService:Create(Button.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
+				task.wait(0.2)
+				TweenService:Create(Button, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
+				TweenService:Create(Button.ElementIndicator, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 0.9}):Play()
+				TweenService:Create(Button.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
 			end)
 
 			Button.MouseEnter:Connect(function()
