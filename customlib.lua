@@ -3476,18 +3476,7 @@ function RayfieldLibrary:LoadConfiguration()
 			})
 		else
 			print(configFile)
-			local success, result = pcall(function()
-				LoadConfiguration(readfile(configFile))
-				return true
-			end)
-
-			if not success or not result then
-				RayfieldLibrary:Notify({
-					Title = "Load Error",
-					Content = "There was an issue loading the configuration file.",
-					Image = "6031071053"
-				})
-			end
+			LoadConfiguration(readfile(configFile))
 		end
 	end
 end
