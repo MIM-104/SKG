@@ -3324,12 +3324,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 	end
 	
 	function Window.ModifyTheme(NewTheme)
-		local success = pcall(ChangeTheme, NewTheme)
-		if not success then
-			RayfieldLibrary:Notify({Title = 'Unable to Change Theme', Content = 'We are unable find a theme on file.'})
-		else
-			RayfieldLibrary:Notify({Title = 'Theme Changed', Content = 'Successfully changed theme to '..NewTheme..'.'})
-		end
+		ChangeTheme(NewTheme)
 	end
 
 	return Window
