@@ -308,7 +308,7 @@ function RayfieldLibrary:Notify(data) -- action e.g open messages
 
 		-- Notification Object Creation
 		print(Notifications)
-		local newNotification = Notifications:WaitForChild("Template"):Clone()
+		local newNotification = Notifications:FindFirstChild("Template"):Clone()
 		newNotification.Name = data.Title or 'No Title Provided'
 		newNotification.Parent = Notifications
 		newNotification.LayoutOrder = #Notifications:GetChildren()
